@@ -1,0 +1,28 @@
+{
+  "name": "commandkit-basic-ts",
+  "description": "A CommandKit project using TypeScript",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "commandkit dev",
+    "build": "commandkit build",
+    "start": "commandkit start"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.0",
+    "commandkit": "^1.2.0-rc.12",
+    "discord.js": "^14.24.0",
+    "dotenv": "^17.2.3",
+    "iso-3166-1": "^2.1.1",
+    "sequelize": "^6.37.7",
+    "sequelize-typescript": "^2.1.6",
+    "sqlite3": "^5.1.7"
+  }
+}
