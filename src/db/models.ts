@@ -36,8 +36,6 @@ interface MessagesAttributes {
     guild: string;
     channel: string;
     discordid: string;
-    content: string;
-    sent: boolean;
 }
 
 interface MessagesCreationAttributes extends Optional<MessagesAttributes, "id"> {};

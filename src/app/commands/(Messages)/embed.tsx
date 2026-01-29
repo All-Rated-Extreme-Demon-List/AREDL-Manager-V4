@@ -379,23 +379,6 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 				});
 			}
 		}
-
-		const editModal = new ModalBuilder()
-			.setCustomId("editEmbedModal")
-			.setTitle("Edit Embed Content");
-
-		const editDescriptionInput = new TextInputBuilder()
-			.setCustomId("editDescriptionInput")
-			.setLabel("New Embed Description (can be empty)")
-			.setStyle(TextInputStyle.Paragraph)
-			.setRequired(false)
-			.setMaxLength(4000)
-			.setValue(targetMessage.embeds[0]?.description || "");
-
-		const editModalRow = new ActionRowBuilder().addComponents(
-			editDescriptionInput,
-		);
-
 		await interaction.showModal(
 			new ModalBuilder()
 				.setCustomId("editEmbedModal")
