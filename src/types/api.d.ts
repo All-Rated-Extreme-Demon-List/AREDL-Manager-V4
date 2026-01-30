@@ -18,3 +18,8 @@ export interface PaginatedResponse<T> {
     page: number;
     per_page: number;
 }
+
+export interface NamedId {
+	id: string;
+	name: string;
+}

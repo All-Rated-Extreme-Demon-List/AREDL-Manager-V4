@@ -1,21 +1,14 @@
 import {
-	SlashCommandBuilder,
-	ContainerBuilder,
-	TextDisplayBuilder,
 	MessageFlags,
 	SeparatorSpacingSize,
 	AttachmentBuilder,
-	FileBuilder,
-	ChatInputCommandInteraction,
 	ApplicationCommandOptionType,
-	FileComponent,
 } from "discord.js";
 import { api } from "../../../api";
 import {
 	opinionPermsRoleID,
 	extremeGrinderRoleID,
 	guildId,
-	noPingListRoleID,
 	staffGuildId,
 } from "@/../config.json";
 import {
@@ -25,13 +18,11 @@ import {
 	CommandMetadata,
 	Container,
 	File,
-	MessageCommandOptions,
 	Separator,
 	TextDisplay,
 } from "commandkit";
 import { ExtendedLevel, Level } from "@/types/level";
-import { ProfileRecord, ProfileRecordExtended } from "@/types/record";
-import { db } from "@/app";
+import { ProfileRecordExtended } from "@/types/record";
 import { NoPingList } from "@/db/models";
 
 const processLevelName = (name: string) => {

@@ -1,18 +1,18 @@
 import { BaseUser } from "./user";
 import { ProfileRecord } from "./record";
+import { NamedId } from "./api";
+import { NamedId } from "./api";
 
-export interface BaseLevel {
-    id: string;
-    name: string;
+export interface BaseLevel extends NamedId {
+	level_id: number;
+	two_player: boolean;
+	position: number;
+	points: number;
+	legacy: boolean;
 }
 
 export interface Level extends BaseLevel {
-    position: number;
     publisher_id: string;
-    points: number;
-    legacy: boolean;
-    level_id: number;
-    two_player: boolean;
     tags: string[];
     description: string;
 }
@@ -25,4 +25,12 @@ export interface ExtendedLevel extends Level {
     nlw_tier: number;
     publisher: BaseUser;
     verifications: ProfileRecord[]
+}
+
+export interface PackTier extends NamedId {
+	color: string;
+}
+
+export interface Pack extends NamedId {
+	tier: PackTier;
 }

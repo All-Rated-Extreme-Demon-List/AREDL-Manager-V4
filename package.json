@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",
+    "@napi-rs/canvas": "^0.1.89",
+    "chartjs-node-canvas": "^5.0.0",
     "commandkit": "^1.2.0-rc.12",
     "discord.js": "^14.24.0",
     "dotenv": "^17.2.3",

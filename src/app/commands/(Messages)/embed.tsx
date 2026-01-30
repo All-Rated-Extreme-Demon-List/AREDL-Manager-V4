@@ -12,16 +12,12 @@ import {
 	HexColorString,
 	LabelBuilder,
 	MessageFlags,
-	ModalSubmitInteraction,
-	ModalSubmitInteractionCollectorOptions,
 } from "discord.js";
 import {
-	SlashCommandBuilder,
 	resolveColor,
 	EmbedBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	ActionRowBuilder,
 	ModalBuilder,
 	TextInputBuilder,
 	TextInputStyle,

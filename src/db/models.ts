@@ -4,7 +4,7 @@ import { defaultPoints } from "../../config.json"
 
 interface DailyStatsAttributes {
     id: number;
-    date?: string;
+    date?: number;
     nbMembersJoined: number;
     mbMembersLeft: number;
 }

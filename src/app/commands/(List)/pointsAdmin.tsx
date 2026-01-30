@@ -1,13 +1,9 @@
 import {
-	SlashCommandBuilder,
-	ChatInputCommandInteraction,
-	ContainerBuilder,
 	SeparatorSpacingSize,
-	TextDisplayBuilder,
 	MessageFlags,
 	ApplicationCommandOptionType,
 } from "discord.js";
-import { enableStaffPoints, defaultPoints, maxPoints } from "@/../config.json";
+import { defaultPoints, maxPoints } from "@/../config.json";
 import {
 	CommandData,
 	ChatInputCommand,

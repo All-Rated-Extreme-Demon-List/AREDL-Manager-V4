@@ -1,19 +1,28 @@
 import { PaginatedResponse } from "./api";
-import { BaseLevel } from "./level";
+import { BaseLevel, Level } from "./level";
 import { BaseUser, Clan, User } from "./user";
 
-export interface ProfileRecordBase<U> {
-    id: string;
-    submitted_by: U;
-    mobile: boolean;
+export interface RecordBase {
+	id: string;
+	mobile: boolean;
     video_url: string;
     hide_video: boolean;
-    achieved_at: string;
+}
+
+export interface ProfileRecordBase<U> extends RecordBase {
+    submitted_by: U;
 }
 
 export type ProfileRecord = ProfileRecordBase<BaseUser>;
 export type ProfileRecordExtended = ProfileRecordBase<User>;
 
+export interface LevelRecordBase<L> extends RecordBase {
+	is_verification: boolean;
+    level: L;
+}
+
+export type LevelRecord = LevelRecordBase<BaseLevel>;
+export type LevelRecordExtended = LevelRecordBase<Level>;
 export interface LeaderboardEntryData {
     rank: number;
     extremes_rank: number;

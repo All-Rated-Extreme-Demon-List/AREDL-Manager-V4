@@ -1,10 +1,6 @@
 import {
-  SlashCommandBuilder,
-  ContainerBuilder,
   MessageFlags,
   SeparatorSpacingSize,
-  TextDisplayBuilder,
-  ChatInputCommandInteraction,
   ApplicationCommandOptionType,
 } from "discord.js";
 import { Container, Separator, TextDisplay } from "commandkit";

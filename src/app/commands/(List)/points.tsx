@@ -1,7 +1,7 @@
 import { ChatInputCommand, CommandData } from "commandkit";
 
-import { SlashCommandBuilder, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { enableStaffPoints, defaultPoints } from '@/../config.json';
+import { MessageFlags } from 'discord.js';
+import { defaultPoints } from '@/../config.json';
 import { StaffPoints } from "@/db/models"
 
 export const command: CommandData = {

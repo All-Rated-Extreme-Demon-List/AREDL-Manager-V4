@@ -1,7 +1,6 @@
-import { AutocompleteCommand, CommandData, CommandMetadata, ChatInputCommand, Logger, ActionRow, Button, Container, TextDisplay, Separator, Section, Thumbnail } from "commandkit";
+import { AutocompleteCommand, CommandData, CommandMetadata, ChatInputCommand, Logger, ActionRow, Button, Container, TextDisplay, Separator, Section } from "commandkit";
 import { api } from "../../../api.ts"
 import { 
-    SlashCommandBuilder,
     ButtonBuilder,
     ThumbnailBuilder,
     ButtonStyle,
