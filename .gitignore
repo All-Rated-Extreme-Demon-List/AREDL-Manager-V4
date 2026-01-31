@@ -29,3 +29,4 @@ lerna-debug.log*
 .temp-example
 
 data/
+config.json
