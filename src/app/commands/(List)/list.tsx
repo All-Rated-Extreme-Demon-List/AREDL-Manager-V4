@@ -23,7 +23,9 @@ import {
 } from "commandkit";
 import { ExtendedLevel, Level } from "@/types/level";
 import { ProfileRecordExtended } from "@/types/record";
-import { NoPingList } from "@/db/models";
+import { db } from "@/app";
+import { noPingListTable } from "@/db/models";
+import { eq } from "drizzle-orm";
 
 const processLevelName = (name: string) => {
 	return name.toLowerCase().replace(/[^a-z0-9_]/g, "_");
@@ -274,9 +276,18 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 		const victorsData = await Promise.all(
 			filteredRecords.map(async (rec) => {
-				const nplEntry = await NoPingList.findOne({
-					where: { userId: rec.submitted_by.discord_id },
-				});
+				const nplEntry = await db
+					.select()
+					.from(noPingListTable)
+					.where(
+						eq(
+							noPingListTable.userId,
+							rec.submitted_by.discord_id ?? "0",
+						),
+					)
+					.limit(1)
+					.get();
+
 				const member = !rec.submitted_by.discord_id
 					? undefined
 					: guild.members.cache.get(rec.submitted_by.discord_id);
@@ -346,7 +357,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		const str = victors
 			.map(
 				(v) =>
-					`${v.username}${v.discordTag ? `\t${v.discordTag}` : ""}${v.discordTag === undefined ? "" : v.noPingList ? `\t(${v.noPingList.dataValues.banned ? "Opinion Banned" : "No Ping List"})\t${v.noPingList.dataValues.notes || ""}` : !v.hasPerms ? `\t${v.inServer ? "(No opinion perms)" : "(Not in server)"}` : ""}`,
+					`${v.username}${v.discordTag ? `\t${v.discordTag}` : ""}${v.discordTag === undefined ? "" : v.noPingList ? `\t(${v.noPingList.banned ? "Opinion Banned" : "No Ping List"})\t${v.noPingList.notes || ""}` : !v.hasPerms ? `\t${v.inServer ? "(No opinion perms)" : "(Not in server)"}` : ""}`,
 			)
 			.join("\n");
 
@@ -473,9 +484,17 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 		const victorsData = await Promise.all(
 			records.map(async (rec) => {
-				const nplEntry = await NoPingList.findOne({
-					where: { userId: rec.submitted_by.discord_id },
-				});
+				const nplEntry = await db
+					.select()
+					.from(noPingListTable)
+					.where(
+						eq(
+							noPingListTable.userId,
+							rec.submitted_by.discord_id ?? "0",
+						),
+					)
+					.limit(1)
+					.get();
 				const member = !rec.submitted_by.discord_id
 					? undefined
 					: guild.members.cache.get(rec.submitted_by.discord_id);
@@ -545,7 +564,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		const str = victors
 			.map(
 				(v) =>
-					`${v.username}${v.discordTag ? `\t${v.discordTag}` : ""}${v.discordTag === undefined ? "" : v.noPingList ? `\t(${v.noPingList.dataValues.banned ? "Opinion Banned" : "No Ping List"})\t${v.noPingList.dataValues.notes || ""}` : !v.hasPerms ? `\t${v.inServer ? "(No opinion perms)" : "(Not in server)"}` : ""}`,
+					`${v.username}${v.discordTag ? `\t${v.discordTag}` : ""}${v.discordTag === undefined ? "" : v.noPingList ? `\t(${v.noPingList.banned ? "Opinion Banned" : "No Ping List"})\t${v.noPingList.notes || ""}` : !v.hasPerms ? `\t${v.inServer ? "(No opinion perms)" : "(Not in server)"}` : ""}`,
 			)
 			.join("\n");
 

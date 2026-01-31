@@ -4,7 +4,7 @@ import { defaultPoints } from "@/../config.json"
 
 export const dailyStatsTable = sqliteTable("daily_stats", {
 	id: int().primaryKey({ autoIncrement: true }),
-	date: int({ mode: "timestamp" }),
+	date: int({ mode: "timestamp" }).notNull(),
 	nbMembersJoined: int().notNull().default(0),
 	nbMembersLeft: int().notNull().default(0),
 })

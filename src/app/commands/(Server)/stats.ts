@@ -1,72 +1,81 @@
-import { EmbedBuilder, AttachmentBuilder, ApplicationCommandOptionType } from 'discord.js';
-import Sequelize from 'sequelize';
-import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
+import {
+	EmbedBuilder,
+	AttachmentBuilder,
+	ApplicationCommandOptionType,
+} from "discord.js";
+import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 // import infoMessageUpdate from '@/app/tasks/infoMessageUpdate';
-import { ChatInputCommand, CommandData } from 'commandkit';
-import { DailyStats, InfoMessages } from '@/db/models';
+import { ChatInputCommand, CommandData } from "commandkit";
+import { dailyStatsTable, infoMessagesTable } from "@/db/models";
+import { db } from "@/app";
+import { asc, eq, gte } from "drizzle-orm";
 
 export const command: CommandData = {
-	name: 'stats',
-	description: 'Statistics about the server',
+	name: "stats",
+	description: "Statistics about the server",
 	options: [
 		{
-			name: 'servertraffic',
-			description: 'Shows info about server members traffic',
+			name: "servertraffic",
+			description: "Shows info about server members traffic",
 			type: ApplicationCommandOptionType.Subcommand, // Subcommand
 		},
 		{
-			name: 'send-list-stats-message',
-			description: 'Send the initial stats info message (placeholder)',
+			name: "send-list-stats-message",
+			description: "Send the initial stats info message (placeholder)",
 			type: ApplicationCommandOptionType.Subcommand, // Subcommand
 		},
 		{
-			name: 'send-list-stats-message-public',
-			description: 'Send the initial stats info message (placeholder) (public version)',
+			name: "send-list-stats-message-public",
+			description:
+				"Send the initial stats info message (placeholder) (public version)",
 			type: ApplicationCommandOptionType.Subcommand, // Subcommand
 		},
 	],
-}
+};
 
 export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	await interaction.deferReply({ ephemeral: true });
 	const sub = interaction.options.getSubcommand();
 
-	if (sub === 'servertraffic') {
-		const minDate = new Date(new Date().getDate() - 30 * 24 * 60 * 60 * 1000);
+	if (sub === "servertraffic") {
+		const minDate = new Date(
+			new Date().getDate() - 30 * 24 * 60 * 60 * 1000,
+		);
 
-		const statsData = await DailyStats.findAll({
-			where: { date: { [Sequelize.Op.gte]: minDate } },
-			order: [['date', 'ASC']],
-		});
+		const statsData = await db
+			.select()
+			.from(dailyStatsTable)
+			.where(gte(dailyStatsTable.date, minDate))
+			.orderBy(asc(dailyStatsTable.date));
 
 		const labels = [];
 		const datasJoined = [];
 		const datasLeft = [];
 
 		for (let i = 0; i < Math.min(30, statsData.length); i++) {
-			labels.push(statsData[i]?.dataValues.date);
-			datasJoined.push(statsData[i]?.dataValues.nbMembersJoined ?? 0);
-			datasLeft.push(-(statsData[i]?.dataValues.nbMembersLeft ?? 0));
+			labels.push(statsData[i]?.date);
+			datasJoined.push(statsData[i]?.nbMembersJoined ?? 0);
+			datasLeft.push(-(statsData[i]?.nbMembersLeft ?? 0));
 		}
 
 		const membersRenderer = new ChartJSNodeCanvas({
 			width: 1600,
 			height: 600,
-			backgroundColour: 'white',
+			backgroundColour: "white",
 		});
 		const membersImage = await membersRenderer.renderToBuffer({
-			type: 'bar',
+			type: "bar",
 			data: {
 				labels: labels,
 				datasets: [
 					{
-						label: 'Members arrivals',
-						backgroundColor: 'blue',
+						label: "Members arrivals",
+						backgroundColor: "blue",
 						data: datasJoined,
 					},
 					{
-						label: 'Members leaves',
-						backgroundColor: 'gray',
+						label: "Members leaves",
+						backgroundColor: "gray",
 						data: datasLeft,
 					},
 				],
@@ -74,17 +83,17 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			options: {
 				responsive: true,
 				plugins: {
-					legend: { position: 'top' },
+					legend: { position: "top" },
 					title: {
 						display: true,
-						text: 'Members traffic over time',
+						text: "Members traffic over time",
 					},
 				},
 			},
 		});
 
 		const membersAttachment = new AttachmentBuilder(membersImage, {
-			name: 'membersgraph.png',
+			name: "membersgraph.png",
 		});
 
 		const totalJoined = datasJoined.reduce((a, b) => a + b, 0);
@@ -92,21 +101,21 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 		const membersStatsEmbed = new EmbedBuilder()
 			.setColor(0xffbf00)
-			.setTitle('Members traffic')
+			.setTitle("Members traffic")
 			.addFields(
-				{ name: 'Past 30 days :', value: ' ' },
+				{ name: "Past 30 days :", value: " " },
 				{
-					name: 'Total arrivals:',
+					name: "Total arrivals:",
 					value: `${totalJoined}`,
 					inline: true,
 				},
 				{
-					name: 'Total leaves:',
+					name: "Total leaves:",
 					value: `${totalLeft}`,
 					inline: true,
 				},
 			)
-			.setImage('attachment://membersgraph.png');
+			.setImage("attachment://membersgraph.png");
 
 		return await interaction.editReply({
 			embeds: [membersStatsEmbed],
@@ -114,11 +123,13 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		});
 	}
 
-	if (sub === 'send-list-stats-message') {
-
-		const existing = await InfoMessages.findOne({
-			where: { name: 'list_stats' },
-		});
+	if (sub === "send-list-stats-message") {
+		const existing = await db
+			.select()
+			.from(infoMessagesTable)
+			.where(eq(infoMessagesTable.name, "list_stats"))
+			.limit(1)
+			.get();
 		if (existing) {
 			return interaction.editReply(
 				`A \`list_stats\` message already exists. Delete it from the DB if you want to create a new one.`,
@@ -127,7 +138,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 		if (!interaction.channel?.isSendable()) {
 			return interaction.editReply({
-				content: ':x: Invalid channel',
+				content: ":x: Invalid channel",
 			});
 		}
 
@@ -135,13 +146,13 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			content: `List stats panel will appear here soon…`,
 		});
 
-		await InfoMessages.create({
-			name: 'list_stats',
+		await db.insert(infoMessagesTable).values({
+			name: "list_stats",
 			guild: interaction.guild?.id ?? "1",
 			channel: interaction.channel.id,
 			discordid: msg.id,
 		});
-		 
+
 		// infoMessageUpdate.execute();
 
 		return interaction.editReply(
@@ -149,11 +160,13 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		);
 	}
 
-	if (sub === 'send-list-stats-message-public') {
-
-		const existing = await InfoMessages.findOne({
-			where: { name: 'list_stats_public' },
-		});
+	if (sub === "send-list-stats-message-public") {
+		const existing = await db
+			.select()
+			.from(infoMessagesTable)
+			.where(eq(infoMessagesTable.name, "list_stats_public"))
+			.limit(1)
+			.get();
 		if (existing) {
 			return interaction.editReply(
 				`A \`list_stats_public\` message already exists. Delete it from the DB if you want to create a new one.`,
@@ -162,7 +175,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 		if (!interaction.channel?.isSendable()) {
 			return interaction.editReply({
-				content: ':x: Invalid channel',
+				content: ":x: Invalid channel",
 			});
 		}
 
@@ -170,8 +183,8 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			content: `List stats panel will appear here soon…`,
 		});
 
-		await InfoMessages.create({
-			name: 'list_stats_public',
+		await db.insert(infoMessagesTable).values({
+			name: "list_stats_public",
 			guild: interaction.guild?.id ?? "1",
 			channel: interaction.channel.id,
 			discordid: msg.id,
@@ -183,4 +196,4 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			`\`list_stats_public\` message sent and stored in the database.`,
 		);
 	}
-}
+};

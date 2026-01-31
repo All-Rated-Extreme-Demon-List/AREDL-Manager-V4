@@ -10,13 +10,7 @@ import { db } from "@/app";
 import { noPingListTable } from "@/db/models";
 import { eq } from "drizzle-orm";
 
-interface NoPingListData {
-	userId: string;
-	notes?: string;
-	banned: boolean;
-}
-
-const mapToStr = (data) => {
+const mapToStr = (data: typeof noPingListTable.$inferSelect[]) => {
   if (data.length === 0) {
     return "*None!*";
   } else {
