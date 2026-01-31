@@ -1,4 +1,4 @@
-import { settingsTable } from "@/db/models";
+import { settingsTable } from "@/db/schema";
 import { ChatInputCommand, CommandData } from "commandkit";
 import { ApplicationCommandOptionType } from "discord.js";
 import { db } from "@/app";

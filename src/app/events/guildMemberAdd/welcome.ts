@@ -1,6 +1,6 @@
 import { EventHandler, Logger } from "commandkit";
 import { db } from "@/app";
-import { dailyStatsTable } from "@/db/models";
+import { dailyStatsTable } from "@/db/schema";
 import {
 	guildId,
 	enableWelcomeMessage,

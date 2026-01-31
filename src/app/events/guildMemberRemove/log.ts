@@ -1,6 +1,6 @@
 import { guildId } from '@/../config.json';
 import { EventHandler, Logger } from 'commandkit';
-import { dailyStatsTable } from '@/db/models';
+import { dailyStatsTable } from '@/db/schema';
 import { db } from '@/app';
 import { eq } from 'drizzle-orm';
 

@@ -18,7 +18,7 @@ import {
 	TextInputStyle,
 } from "discord.js";
 import { db } from "@/app";
-import { messagesTable } from "@/db/models";
+import { messagesTable } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 
 export const command: CommandData = {

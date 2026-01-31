@@ -12,7 +12,7 @@ import {
 	Separator,
 } from "commandkit";
 import { db } from "@/app";
-import { staffPointsTable } from "@/db/models";
+import { staffPointsTable } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 
 export const command: CommandData = {

@@ -6,7 +6,7 @@ import {
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 // import infoMessageUpdate from '@/app/tasks/infoMessageUpdate';
 import { ChatInputCommand, CommandData } from "commandkit";
-import { dailyStatsTable, infoMessagesTable } from "@/db/models";
+import { dailyStatsTable, infoMessagesTable } from "@/db/schema";
 import { db } from "@/app";
 import { asc, eq, gte } from "drizzle-orm";
 

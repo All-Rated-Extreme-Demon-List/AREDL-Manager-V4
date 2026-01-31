@@ -2,16 +2,14 @@ import { sqliteTable, int, text } from "drizzle-orm/sqlite-core";
 import { defaultPoints } from "@/../config.json"
 
 
-export const dailyStatsTable = sqliteTable("daily_stats", {
-	id: int().primaryKey({ autoIncrement: true }),
+export const dailyStatsTable = sqliteTable("dailyStats", {
 	date: int({ mode: "timestamp" }).notNull(),
 	nbMembersJoined: int().notNull().default(0),
 	nbMembersLeft: int().notNull().default(0),
 })
 
 export const embedsTable = sqliteTable("embeds", {
-	id: int().primaryKey({ autoIncrement: true }),
-	name: text().notNull(),
+	name: text().primaryKey(),
 	guild: text().notNull(),
 	channel: text().notNull(),
 	discordid: text().notNull(),
@@ -22,24 +20,22 @@ export const embedsTable = sqliteTable("embeds", {
 })
 
 export const messagesTable = sqliteTable("messages", {
-	id: int().primaryKey({ autoIncrement: true }),
-	name: text().notNull(),
+	name: text().primaryKey(),
 	guild: text().notNull(),
 	channel: text().notNull(),
 	discordid: text().notNull(),
 })
 
 export const settingsTable = sqliteTable("settings", {
-	id: int().primaryKey({ autoIncrement: true }),
-	user: text().notNull(),
+	user: text().primaryKey(),
 	shiftPings: int({ mode: "boolean" }).notNull().default(true),
 })
 
-export const sentUcRemindersTable = sqliteTable("sent_uc_reminders", {
+export const sentUcRemindersTable = sqliteTable("sentUcReminders", {
 	id: text().primaryKey(),
 })
 
-export const shiftNotificationsTable = sqliteTable("shift_notifications", {
+export const shiftNotificationsTable = sqliteTable("shiftReminders", {
 	id: int().primaryKey({ autoIncrement: true }),
 	user_id: text().notNull(),
 	start_at: int({ mode: "timestamp" }).notNull(),
@@ -48,8 +44,7 @@ export const shiftNotificationsTable = sqliteTable("shift_notifications", {
 })
 
 export const infoMessagesTable = sqliteTable("info_messages", {
-	id: int().primaryKey({ autoIncrement: true }),
-	name: text().notNull(),
+	name: text().primaryKey(),
 	guild: text().notNull(),
 	channel: text().notNull(),
 	discordid: text().notNull(),
@@ -65,7 +60,7 @@ export const weeklyMissedShiftsTable = sqliteTable("weekly_missed_shifts", {
 	missed_all: int({ mode: "boolean" }).notNull(),
 })
 
-export const noPingListTable = sqliteTable("no_ping_list", {
+export const noPingListTable = sqliteTable("noPingLists", {
 	userId: text().primaryKey(),
 	notes: text(),
 	banned: int({ mode: "boolean" }).notNull().default(false),

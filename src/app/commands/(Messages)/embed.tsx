@@ -22,7 +22,7 @@ import {
 	TextInputStyle,
 } from "discord.js";
 import { db } from "@/app";
-import { embedsTable } from "@/db/models";
+import { embedsTable } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 
 export const command: CommandData = {

@@ -24,7 +24,7 @@ import {
 import { ExtendedLevel, Level } from "@/types/level";
 import { ProfileRecordExtended } from "@/types/record";
 import { db } from "@/app";
-import { noPingListTable } from "@/db/models";
+import { noPingListTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 const processLevelName = (name: string) => {

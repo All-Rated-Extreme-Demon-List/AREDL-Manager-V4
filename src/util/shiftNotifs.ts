@@ -4,7 +4,7 @@ import { Logger } from "commandkit";
 import { User } from "@/types/user";
 import { api } from "@/api";
 import { db } from "@/app";
-import { shiftNotificationsTable, settingsTable } from "@/db/models";
+import { shiftNotificationsTable, settingsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const sendShiftNotif = async (
