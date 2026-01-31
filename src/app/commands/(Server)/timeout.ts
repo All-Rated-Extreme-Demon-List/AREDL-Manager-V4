@@ -1,13 +1,10 @@
 import {
-	SlashCommandBuilder,
-	ChatInputCommandInteraction,
-	PermissionsBitField,
 	ApplicationCommandOptionType,
 	GuildMemberManager,
 	GuildMemberRoleManager,
 } from "discord.js";
 import { timeoutLogsChannelID } from "@/../config.json";
-import { CommandData, Logger } from "commandkit";
+import { ChatInputCommand, CommandData, Logger } from "commandkit";
 import { commandGuilds } from "@/util/commandGuilds";
 
 export const metadata = commandGuilds();
@@ -50,11 +47,7 @@ export const command: CommandData = {
 	],
 };
 
-export const chatInput = async ({
-	interaction,
-}: {
-	interaction: ChatInputCommandInteraction;
-}) => {
+export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	await interaction.deferReply();
 	const user = interaction.options.getUser("user", true);
 	const member = interaction.guild?.members.cache.get(user.id);
@@ -63,7 +56,9 @@ export const chatInput = async ({
 	}
 
 	if (!(interaction.member?.roles instanceof GuildMemberManager)) {
-		return interaction.editReply(":x: Error timing this user out: could not fetch your roles.");
+		return interaction.editReply(
+			":x: Error timing this user out: could not fetch your roles.",
+		);
 	}
 
 	// - bot permission checks
@@ -87,8 +82,8 @@ export const chatInput = async ({
 	}
 	// check role hierarchy
 	if (
-		(interaction.member?.roles as GuildMemberRoleManager).highest?.position <=
-		member.roles.highest?.position
+		(interaction.member?.roles as GuildMemberRoleManager).highest
+			?.position <= member.roles.highest?.position
 	) {
 		return interaction.editReply(
 			":x: You cannot timeout a user with an equal or higher role than you.",

@@ -26,6 +26,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src", "commandkit.config.ts", "commandkit-env.d.ts"],
+  "include": ["src", "commandkit.config.ts", "commandkit-env.d.ts", "clearCommands.ts"],
   "exclude": ["dist", "node_modules", ".commandkit"]
 }
