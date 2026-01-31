@@ -6,7 +6,7 @@ interface DailyStatsAttributes {
     id: number;
     date?: number;
     nbMembersJoined: number;
-    mbMembersLeft: number;
+    nbMembersLeft: number;
 }
 
 interface DailyStatsCreationAttributes extends Optional<DailyStatsAttributes, "id"> {};
@@ -63,7 +63,7 @@ interface SentUcRemindersCreationAttributes extends Optional<SentUcRemindersAttr
 @Table
 export class SentUcReminders extends Model<SentUcRemindersAttributes, SentUcRemindersCreationAttributes> {}
 
-interface ShiftNotificationsAttributes {
+export interface ShiftNotificationsAttributes {
     id: number;
     user_id: string;
     start_at: Date;

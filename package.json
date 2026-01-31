@@ -16,6 +16,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@commandkit/tasks": "^1.2.0-rc.13",
     "@libsql/client": "^0.17.0",
     "@napi-rs/canvas": "^0.1.89",
     "chartjs-node-canvas": "^5.0.0",

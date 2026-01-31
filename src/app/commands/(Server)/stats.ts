@@ -1,8 +1,9 @@
-import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder, ApplicationCommandOptionType } from 'discord.js';
+import { EmbedBuilder, AttachmentBuilder, ApplicationCommandOptionType } from 'discord.js';
 import Sequelize from 'sequelize';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
-import infoMessageUpdate from '@/scheduled/infoMessageUpdate';
+// import infoMessageUpdate from '@/app/tasks/infoMessageUpdate';
 import { ChatInputCommand, CommandData } from 'commandkit';
+import { DailyStats, InfoMessages } from '@/db/models';
 
 export const command: CommandData = {
 	name: 'stats',
@@ -31,10 +32,9 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	const sub = interaction.options.getSubcommand();
 
 	if (sub === 'servertraffic') {
-		const { db } = require('../../index.js');
 		const minDate = new Date(new Date().getDate() - 30 * 24 * 60 * 60 * 1000);
 
-		const statsData = await db.dailyStats.findAll({
+		const statsData = await DailyStats.findAll({
 			where: { date: { [Sequelize.Op.gte]: minDate } },
 			order: [['date', 'ASC']],
 		});
@@ -44,9 +44,9 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		const datasLeft = [];
 
 		for (let i = 0; i < Math.min(30, statsData.length); i++) {
-			labels.push(statsData[i].date);
-			datasJoined.push(statsData[i].nbMembersJoined);
-			datasLeft.push(-statsData[i].nbMembersLeft);
+			labels.push(statsData[i]?.dataValues.date);
+			datasJoined.push(statsData[i]?.dataValues.nbMembersJoined ?? 0);
+			datasLeft.push(-(statsData[i]?.dataValues.nbMembersLeft ?? 0));
 		}
 
 		const membersRenderer = new ChartJSNodeCanvas({
@@ -115,9 +115,8 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	}
 
 	if (sub === 'send-list-stats-message') {
-		const { db } = require('../../index.js');
 
-		const existing = await db.info_messages.findOne({
+		const existing = await InfoMessages.findOne({
 			where: { name: 'list_stats' },
 		});
 		if (existing) {
@@ -136,14 +135,14 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			content: `List stats panel will appear here soon…`,
 		});
 
-		await db.info_messages.create({
+		await InfoMessages.create({
 			name: 'list_stats',
-			guild: interaction.guild?.id,
+			guild: interaction.guild?.id ?? "1",
 			channel: interaction.channel.id,
 			discordid: msg.id,
 		});
-
-		infoMessageUpdate.execute();
+		 
+		// infoMessageUpdate.execute();
 
 		return interaction.editReply(
 			`\`list_stats\` message sent and stored in the database.`,
@@ -151,9 +150,8 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	}
 
 	if (sub === 'send-list-stats-message-public') {
-		const { db } = require('../../index.js');
 
-		const existing = await db.info_messages.findOne({
+		const existing = await InfoMessages.findOne({
 			where: { name: 'list_stats_public' },
 		});
 		if (existing) {
@@ -172,14 +170,14 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			content: `List stats panel will appear here soon…`,
 		});
 
-		await db.info_messages.create({
+		await InfoMessages.create({
 			name: 'list_stats_public',
-			guild: interaction.guild?.id,
+			guild: interaction.guild?.id ?? "1",
 			channel: interaction.channel.id,
 			discordid: msg.id,
 		});
 
-		infoMessageUpdate.execute();
+		// infoMessageUpdate.execute();
 
 		return interaction.editReply(
 			`\`list_stats_public\` message sent and stored in the database.`,

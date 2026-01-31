@@ -1,7 +1,6 @@
 import { BaseUser } from "./user";
 import { ProfileRecord } from "./record";
 import { NamedId } from "./api";
-import { NamedId } from "./api";
 
 export interface BaseLevel extends NamedId {
 	level_id: number;

@@ -2,9 +2,7 @@ import { Settings } from "@/db/models";
 import { ChatInputCommand, CommandData } from "commandkit";
 import { ApplicationCommandOptionType } from "discord.js";
 
-const { SlashCommandBuilder } = require('discord.js');
-
-const command: CommandData = {
+export const command: CommandData = {
 	name: "settings",
 	description: "Command to configure some settings",
 	options: [

@@ -7,10 +7,10 @@ const handler: EventHandler<'guildMemberRemove'> = async (member) => {
 	if (member.guild.id != guildId) return;
 	Logger.info(`Member left: ${member.id}`);
 
-	const [entry, created] = await DailyStats.findOrCreate({
+	const [entry, _] = await DailyStats.findOrCreate({
 		where: { date: Date.now() },
 	});
-	entry.dataValues.mbMembersLeft += 1;
+	entry.dataValues.nbMembersLeft += 1;
 	await entry.save();
 }
 

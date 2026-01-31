@@ -1,0 +1,66 @@
+import { Settings, ShiftNotifications, ShiftNotificationsAttributes } from "@/db/models";
+import { EmbedBuilder, SendableChannels } from "discord.js";
+import { shiftsStartedID } from "@/../config.json";
+import { Logger } from "commandkit";
+import { User }  from "@/types/user"
+import { api } from "@/api";
+
+export const sendShiftNotif = async (channel: SendableChannels, shift: ShiftNotificationsAttributes, shiftID: number) => {
+	if (!shiftsStartedID) return 0;
+	try {
+		const reviewerResponse = await api.send<User>(
+			`/users/${shift.user_id}`,
+			'GET',
+		);
+		if (reviewerResponse.error) {
+			Logger.error(
+				`Shift Notification - Error fetching reviewer ${shift.user_id}: ${reviewerResponse.data.message}`,
+			);
+			await ShiftNotifications.destroy({ where: { id: shiftID } });
+			return 1;
+		}
+		let pingStr;
+		if (reviewerResponse.data.discord_id) {
+			const settings = await Settings.findOne({
+				where: {
+					user: reviewerResponse.data.discord_id,
+				},
+			});
+			if (!settings || settings.dataValues.shiftPings === true) {
+				pingStr = `<@${reviewerResponse.data.discord_id}>`;
+			}
+		}
+		// Get unix timestamps for the Discord embed
+		const startDate = Math.floor(new Date(shift.start_at).getTime() / 1000);
+		const endDate = Math.floor(new Date(shift.end_at).getTime() / 1000);
+		
+		const archiveEmbed = new EmbedBuilder()
+			.setColor(0x8fce00)
+			.setTitle(`:white_check_mark: Shift started!`)
+			.setDescription(
+				`${reviewerResponse.data.discord_id ? `<@${reviewerResponse.data.discord_id}>` : reviewerResponse.data.global_name}`,
+			)
+			.addFields([
+				{ name: 'Count', value: `${shift.target_count} records` },
+				{ name: 'Starts at', value: `<t:${startDate}>` },
+				{ name: 'Ends at', value: `<t:${endDate}>, <t:${endDate}:R>` },
+			])
+			.setTimestamp();
+
+		await channel.send({ content: pingStr, embeds: [archiveEmbed] });
+		await ShiftNotifications.destroy({ where: { id: shiftID } });
+		Logger.info(`Successfully sent and deleted shift notification (ID: ${shiftID})`);
+		return 0;
+	} catch (e) {
+		Logger.error(`Shift Notification - Error sending shift notification: ${e}`);
+		Logger.error(shift);
+		try {
+			await ShiftNotifications.destroy({ where: { id: shiftID } });
+			Logger.info(`Deleted shift notification after error (ID: ${shiftID})`);
+		} catch (deleteErr) {
+			Logger.error(`Failed to delete shift notification (ID: ${shiftID}) after error:`);
+			Logger.error(deleteErr)
+		}
+		return 1;
+	}
+}

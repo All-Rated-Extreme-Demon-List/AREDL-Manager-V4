@@ -17,7 +17,7 @@ const applyText = (canvas: Canvas.Canvas, text: string): string => {
 const handler: EventHandler<"guildMemberAdd"> = async (member) => {
 	if (member.guild.id != guildId) return;
 
-	const [stat, created] = await DailyStats.findOrCreate({
+	const [stat, _] = await DailyStats.findOrCreate({
 		where: { date: Date.now() },
 	})
 	stat.dataValues.nbMembersJoined += 1;
