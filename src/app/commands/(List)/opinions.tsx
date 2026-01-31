@@ -3,12 +3,13 @@ import {
   SeparatorSpacingSize,
   ApplicationCommandOptionType,
 } from "discord.js";
-import { Container, Separator, TextDisplay } from "commandkit";
-import { guildId, noPingListRoleID } from "@/../config.json";
+import { Container, Separator, TextDisplay, CommandMetadata } from "commandkit";
+import { guildId, noPingListRoleID, staffGuildId } from "@/../config.json";
 import { ChatInputCommand, CommandData } from "commandkit";
 import { db } from "@/app";
 import { noPingListTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { commandGuilds } from "@/util/commandGuilds";
 
 const mapToStr = (data: typeof noPingListTable.$inferSelect[]) => {
   if (data.length === 0) {
@@ -22,6 +23,8 @@ const mapToStr = (data: typeof noPingListTable.$inferSelect[]) => {
       .join("\n");
   }
 };
+
+export const metadata = commandGuilds();
 
 export const command: CommandData = {
     name: "nopinglist",

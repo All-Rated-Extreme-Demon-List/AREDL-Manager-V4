@@ -5,10 +5,14 @@ import {
 } from "discord.js";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 // import infoMessageUpdate from '@/app/tasks/infoMessageUpdate';
-import { ChatInputCommand, CommandData } from "commandkit";
+import { ChatInputCommand, CommandData, CommandMetadata } from "commandkit";
 import { dailyStatsTable, infoMessagesTable } from "@/db/schema";
 import { db } from "@/app";
 import { asc, eq, gte } from "drizzle-orm";
+import { guildId, staffGuildId } from "@/../config.json";
+import { commandGuilds } from "@/util/commandGuilds";
+
+export const metadata = commandGuilds()
 
 export const command: CommandData = {
 	name: "stats",

@@ -8,6 +8,9 @@ import {
 } from "discord.js";
 import { timeoutLogsChannelID } from "@/../config.json";
 import { CommandData, Logger } from "commandkit";
+import { commandGuilds } from "@/util/commandGuilds";
+
+export const metadata = commandGuilds();
 
 export const command: CommandData = {
 	name: "timeout",

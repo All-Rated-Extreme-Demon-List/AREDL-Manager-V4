@@ -24,6 +24,9 @@ import {
 	TextDisplay,
 } from "commandkit";
 import { Profile } from "@/types/user";
+import { commandGuilds } from "@/util/commandGuilds";
+
+export const metadata = commandGuilds();
 
 export const syncRoles = async (
 	interaction: ChatInputCommandInteraction,

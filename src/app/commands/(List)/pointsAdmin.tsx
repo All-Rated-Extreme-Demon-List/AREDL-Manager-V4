@@ -3,17 +3,21 @@ import {
 	MessageFlags,
 	ApplicationCommandOptionType,
 } from "discord.js";
-import { defaultPoints, maxPoints } from "@/../config.json";
+import { defaultPoints, maxPoints, staffGuildId } from "@/../config.json";
 import {
 	CommandData,
 	ChatInputCommand,
 	Container,
 	TextDisplay,
 	Separator,
+	CommandMetadata
 } from "commandkit";
 import { db } from "@/app";
 import { staffPointsTable } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
+import { commandGuilds } from "@/util/commandGuilds";
+
+export const metadata = commandGuilds()
 
 export const command: CommandData = {
 	name: "pointsadmin",

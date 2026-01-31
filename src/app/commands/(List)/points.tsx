@@ -1,15 +1,17 @@
-import { ChatInputCommand, CommandData } from "commandkit";
-
+import { ChatInputCommand, CommandData, CommandMetadata } from "commandkit";
 import { MessageFlags } from 'discord.js';
-import { defaultPoints } from '@/../config.json';
+import { defaultPoints, staffGuildId } from '@/../config.json';
 import { staffPointsTable } from "@/db/schema"
 import { db } from "@/app";
 import { eq } from "drizzle-orm";
+import { commandGuilds } from "@/util/commandGuilds";
 
 export const command: CommandData = {
     name: "points",
     description: "View your total Pukeko Points"
 }
+
+export const metadata = commandGuilds();
 
 export const chatInput: ChatInputCommand = async ({interaction}) => {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });

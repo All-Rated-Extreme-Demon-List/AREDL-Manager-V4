@@ -5,6 +5,7 @@ import {
 	Logger,
 	ActionRow,
 	Button,
+	CommandMetadata
 } from "commandkit";
 import {
 	ApplicationCommandOptionType,
@@ -24,6 +25,10 @@ import {
 import { db } from "@/app";
 import { embedsTable } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
+import { guildId, staffGuildId } from "@/../config.json";
+import { commandGuilds } from "@/util/commandGuilds";
+
+export const metadata = commandGuilds()
 
 export const command: CommandData = {
 	name: "embed",

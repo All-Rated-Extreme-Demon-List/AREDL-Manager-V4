@@ -26,14 +26,13 @@ import { ProfileRecordExtended } from "@/types/record";
 import { db } from "@/app";
 import { noPingListTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { commandGuilds } from "@/util/commandGuilds";
 
 const processLevelName = (name: string) => {
 	return name.toLowerCase().replace(/[^a-z0-9_]/g, "_");
 };
 
-export const metadata: CommandMetadata = {
-	guilds: [guildId, staffGuildId],
-};
+export const metadata = commandGuilds()
 
 export const command: CommandData = {
 	name: "list",

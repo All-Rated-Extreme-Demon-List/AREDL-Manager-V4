@@ -17,6 +17,7 @@ import { ExtendedLevel, Level } from "@/types/level.ts";
 import { staffGuildId, guildId } from "../../../../config.json"
 import { BaseUser } from "@/types/user.js";
 import { LeaderboardEntry } from "@/types/record.js";
+import { commandGuilds } from "@/util/commandGuilds.ts";
 
 const usersPerPage = 11;
 
@@ -45,9 +46,7 @@ function getColor(pos: number) {
     }
 }
 
-export const metadata: CommandMetadata = {
-    guilds: [guildId, staffGuildId],
-}
+export const metadata = commandGuilds();
 
 export const command: CommandData = {
     name: "aredl",
