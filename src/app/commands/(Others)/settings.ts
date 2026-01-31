@@ -1,6 +1,7 @@
-import { Settings } from "@/db/models";
+import { settingsTable } from "@/db/models";
 import { ChatInputCommand, CommandData } from "commandkit";
 import { ApplicationCommandOptionType } from "discord.js";
+import { db } from "@/app";
 
 export const command: CommandData = {
 	name: "settings",
@@ -22,15 +23,16 @@ export const command: CommandData = {
 export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	await interaction.deferReply({ ephemeral: true });
 	const shiftPings = interaction.options.getString('shift-pings');
-	const [entry, _] = await Settings.findOrCreate({
-		where: { user: interaction.user.id },
+
+	await db.insert(settingsTable).values({
+		user: interaction.user.id,
+		shiftPings: shiftPings === "on" ? true : false,
+	}).onConflictDoUpdate({
+		target: settingsTable.user,
+		set: {
+			shiftPings: shiftPings === "on" ? true : false,
+		},
 	});
 
-	if (shiftPings) {
-		const enabled = shiftPings === 'on';
-		entry.dataValues.shiftPings = enabled;
-	}
-
-	entry.save()
 	await interaction.editReply(`:white_check_mark: Updated!`);
 }

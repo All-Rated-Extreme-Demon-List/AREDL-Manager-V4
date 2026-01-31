@@ -1,132 +1,78 @@
-import { Sequelize, Model, Table } from "sequelize-typescript";
-import { DataTypes, Optional } from "sequelize";
-import { defaultPoints } from "../../config.json"
+import { sqliteTable, int, text } from "drizzle-orm/sqlite-core";
+import { defaultPoints } from "@/../config.json"
 
-interface DailyStatsAttributes {
-    id: number;
-    date?: number;
-    nbMembersJoined: number;
-    nbMembersLeft: number;
-}
 
-interface DailyStatsCreationAttributes extends Optional<DailyStatsAttributes, "id"> {};
+export const dailyStatsTable = sqliteTable("daily_stats", {
+	id: int().primaryKey({ autoIncrement: true }),
+	date: int({ mode: "timestamp" }),
+	nbMembersJoined: int().notNull().default(0),
+	nbMembersLeft: int().notNull().default(0),
+})
 
-@Table
-export class DailyStats extends Model<DailyStatsAttributes, DailyStatsCreationAttributes> {}
+export const embedsTable = sqliteTable("embeds", {
+	id: int().primaryKey({ autoIncrement: true }),
+	name: text().notNull(),
+	guild: text().notNull(),
+	channel: text().notNull(),
+	discordid: text().notNull(),
+	title: text(),
+	description: text(),
+	color: text(),
+	image: text(),
+})
 
-interface EmbedsAttributes {
-    id: number;
-    name: string;
-    guild: string;
-    channel: string;
-    discordid: string;
-    title?: string;
-    description?: string;
-    color?: string;
-    image?: string;
-}
+export const messagesTable = sqliteTable("messages", {
+	id: int().primaryKey({ autoIncrement: true }),
+	name: text().notNull(),
+	guild: text().notNull(),
+	channel: text().notNull(),
+	discordid: text().notNull(),
+})
 
-interface EmbedsCreationAttributes extends Optional<EmbedsAttributes, "id"> {};
+export const settingsTable = sqliteTable("settings", {
+	id: int().primaryKey({ autoIncrement: true }),
+	user: text().notNull(),
+	shiftPings: int({ mode: "boolean" }).notNull().default(true),
+})
 
-@Table
-export class Embeds extends Model<EmbedsAttributes, EmbedsCreationAttributes> {}
-interface MessagesAttributes {
-    id: number;
-    name: string;
-    guild: string;
-    channel: string;
-    discordid: string;
-}
+export const sentUcRemindersTable = sqliteTable("sent_uc_reminders", {
+	id: text().primaryKey(),
+})
 
-interface MessagesCreationAttributes extends Optional<MessagesAttributes, "id"> {};
+export const shiftNotificationsTable = sqliteTable("shift_notifications", {
+	id: int().primaryKey({ autoIncrement: true }),
+	user_id: text().notNull(),
+	start_at: int({ mode: "timestamp" }).notNull(),
+	end_at: int({ mode: "timestamp" }).notNull(),
+	target_count: int().notNull(),
+})
 
-@Table
-export class Messages extends Model<MessagesAttributes, MessagesCreationAttributes> {}
+export const infoMessagesTable = sqliteTable("info_messages", {
+	id: int().primaryKey({ autoIncrement: true }),
+	name: text().notNull(),
+	guild: text().notNull(),
+	channel: text().notNull(),
+	discordid: text().notNull(),
+})
 
-interface SettingsAttributes {
-    id: number;
-    user: string;
-    shiftPings: boolean;
-}
+export const staffPointsTable = sqliteTable("staff_points", {
+	user: text().primaryKey(),
+	points: int().notNull().default(defaultPoints),
+})
 
-interface SettingsCreationAttributes extends Optional<SettingsAttributes, "id"> {};
+export const weeklyMissedShiftsTable = sqliteTable("weekly_missed_shifts", {
+	user: text().primaryKey(),
+	missed_all: int({ mode: "boolean" }).notNull(),
+})
 
-@Table
-export class Settings extends Model<SettingsAttributes, SettingsCreationAttributes> {}
+export const noPingListTable = sqliteTable("no_ping_list", {
+	userId: text().primaryKey(),
+	notes: text(),
+	banned: int({ mode: "boolean" }).notNull().default(false),
+})
 
-interface SentUcRemindersAttributes {
-    id: string;
-}
-
-interface SentUcRemindersCreationAttributes extends Optional<SentUcRemindersAttributes, "id"> {};
-
-@Table
-export class SentUcReminders extends Model<SentUcRemindersAttributes, SentUcRemindersCreationAttributes> {}
-
-export interface ShiftNotificationsAttributes {
-    id: number;
-    user_id: string;
-    start_at: Date;
-    end_at: Date;
-    target_count: number;
-}
-
-interface ShiftNotificationsCreationAttributes extends Optional<ShiftNotificationsAttributes, "id"> {};
-
-@Table
-export class ShiftNotifications extends Model<ShiftNotificationsAttributes, ShiftNotificationsCreationAttributes> {}
-
-interface InfoMessagesAttributes {
-    id: number;
-    name: string;
-    guild: string;
-    channel: string;
-    discordid: string;
-}
-
-interface InfoMessagesCreationAttributes extends Optional<InfoMessagesAttributes, "id"> {};
-
-@Table
-export class InfoMessages extends Model<InfoMessagesAttributes, InfoMessagesCreationAttributes> {}
-
-interface StaffPointsAttributes {
-    user: string;
-    points: number;
-}
-
-interface StaffPointsCreationAttributes extends Optional<StaffPointsAttributes, "user"> {};
-
-@Table
-export class StaffPoints extends Model<StaffPointsAttributes, StaffPointsCreationAttributes> {}
-
-interface WeeklyMissedShiftsAttributes {
-    user: string;
-    missed_all: boolean;
-}
-
-interface WeeklyMissedShiftsCreationAttributes extends Optional<WeeklyMissedShiftsAttributes, "user"> {};
-
-@Table
-export class WeeklyMissedShifts extends Model<WeeklyMissedShiftsAttributes, WeeklyMissedShiftsCreationAttributes> {}
-
-export interface NoPingListAttributes {
-    userId: string;
-    notes?: string;
-    banned: boolean;
-}
-
-interface NoPingListCreationAttributes extends Optional<NoPingListAttributes, "userId"> {};
-
-@Table
-export class NoPingList extends Model<NoPingListAttributes, NoPingListCreationAttributes> {}
-
-interface UcThreadsAttributes {
-    submission_id: string;
-    message_id: string;
-    thread_id: string;
-}
-
-interface UcThreadsCreationAttributes extends Optional<UcThreadsAttributes, "submission_id"> {};
-
-@Table
-export class UcThreads extends Model<UcThreadsAttributes, UcThreadsCreationAttributes> {}
+export const ucThreadsTable = sqliteTable("uc_threads", {
+	submission_id: text().primaryKey(),
+	message_id: text().notNull(),
+	thread_id: text().notNull(),
+})

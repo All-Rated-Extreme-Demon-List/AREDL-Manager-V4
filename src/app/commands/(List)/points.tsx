@@ -2,7 +2,9 @@ import { ChatInputCommand, CommandData } from "commandkit";
 
 import { MessageFlags } from 'discord.js';
 import { defaultPoints } from '@/../config.json';
-import { StaffPoints } from "@/db/models"
+import { staffPointsTable } from "@/db/models"
+import { db } from "@/app";
+import { eq } from "drizzle-orm";
 
 export const command: CommandData = {
     name: "points",
@@ -11,9 +13,10 @@ export const command: CommandData = {
 
 export const chatInput: ChatInputCommand = async ({interaction}) => {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-	const [user, _] = await StaffPoints.findOrCreate({ 
-		where: { user: interaction.user.id },
-		defaults: { points: defaultPoints },
-	});
-	return await interaction.editReply(`You have **${Math.round(user.dataValues.points * 100) / 100}** Pukeko Points.`);
+	const user = await db.insert(staffPointsTable).values({
+		user: interaction.user.id,
+		points: defaultPoints,
+	}).onConflictDoNothing().returning().get();
+
+	return await interaction.editReply(`You have **${Math.round(user.points * 100) / 100}** Pukeko Points.`);
 }

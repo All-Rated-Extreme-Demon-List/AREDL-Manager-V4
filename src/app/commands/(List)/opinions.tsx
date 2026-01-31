@@ -5,11 +5,18 @@ import {
 } from "discord.js";
 import { Container, Separator, TextDisplay } from "commandkit";
 import { guildId, noPingListRoleID } from "@/../config.json";
-import { NoPingListAttributes } from "@/db/models";
 import { ChatInputCommand, CommandData } from "commandkit";
-import { NoPingList } from "@/db/models";
+import { db } from "@/app";
+import { noPingListTable } from "@/db/models";
+import { eq } from "drizzle-orm";
 
-const mapToStr = (data: NoPingListAttributes[]) => {
+interface NoPingListData {
+	userId: string;
+	notes?: string;
+	banned: boolean;
+}
+
+const mapToStr = (data) => {
   if (data.length === 0) {
     return "*None!*";
   } else {
@@ -108,12 +115,12 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     const subcommand = interaction.options.getSubcommand();
     if (subcommand === "view") {
-        const allUsers = await NoPingList.findAll();
+        const allUsers = await db.select().from(noPingListTable)
         const banned = [];
-        const noPingList: NoPingListAttributes[] = [];
+        const noPingListEntries = [];
         for (const user of allUsers) {
-            if (user.dataValues.banned) banned.push(user.dataValues);
-            else noPingList.push(user.dataValues);
+            if (user.banned) banned.push(user);
+            else noPingListEntries.push(user);
         }
 
         const container = (
@@ -135,7 +142,7 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
                     **__No Ping List__**
                 </TextDisplay>
                 <TextDisplay>
-                    {mapToStr(noPingList)}
+                    {mapToStr(noPingListEntries)}
                 </TextDisplay>
             </Container>
         )
@@ -148,19 +155,18 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
         const banned = interaction.options.getNumber("banned") === 1;
         const notes = interaction.options.getString("notes");
 
-        const [entry, created] = await NoPingList.findOrCreate({
-            where: { userId: user.id },
-            defaults: {
-                banned: banned,
-                notes: notes ?? undefined,
-            },
-        });
-
-        if (!created) {
-            entry.dataValues.banned = banned;
-            entry.dataValues.notes = notes ?? undefined;
-            entry.save();
-        }
+        await db.insert(noPingListTable).values({
+            userId: user.id,
+            banned: banned,
+            notes: notes ?? undefined,
+        })
+		.onConflictDoUpdate({
+			target: noPingListTable.userId,
+			set: {
+				banned: banned,
+				notes: notes ?? null,
+			}
+		})
 
         // do not add role if banning
         if (!banned) {
@@ -176,16 +182,14 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
     } else if (subcommand === "remove") {
         const user = interaction.options.getUser("user", true);
 
-        const entry = await NoPingList.findOne({
-            where: { userId: user.id },
-        });
+        const entry = await db.select().from(noPingListTable).where(eq(noPingListTable.userId, user.id)).limit(1).get();
         if (!entry) {
             return await interaction.editReply(
                 `:x: ${user} is not on the No Ping List.`,
             );
         }
 
-        await entry.destroy();
+        await db.delete(noPingListTable).where(eq(noPingListTable.userId, user.id)).execute();
         await interaction.client.guilds.cache
             .get(guildId)
             ?.members.cache.get(user.id)
@@ -196,9 +200,7 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
         );
     } else if (subcommand === "find") {
         const user = interaction.options.getUser("user", true);
-        const entry = await NoPingList.findOne({
-            where: { userId: user.id },
-        });
+        const entry = await db.select().from(noPingListTable).where(eq(noPingListTable.userId, user.id)).limit(1).then(res => res[0]);
         if (!entry) {
             return await interaction.editReply(
                 `:x: ${user} is not on the No Ping List.`,
@@ -206,7 +208,7 @@ export const chatInput: ChatInputCommand = async ({interaction}) => {
         }
 
         return await interaction.editReply(
-            `:white_check_mark: ${user} is ${entry.dataValues.banned ? "opinion banned" : "on the No Ping List"}.`,
+            `:white_check_mark: ${user} is ${entry.banned ? "opinion banned" : "on the No Ping List"}.`,
         );
     }
 }

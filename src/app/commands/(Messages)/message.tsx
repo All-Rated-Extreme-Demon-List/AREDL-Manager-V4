@@ -1,4 +1,3 @@
-import { Messages } from "@/db/models";
 import {
 	ActionRow,
 	AutocompleteCommand,
@@ -12,13 +11,15 @@ import {
 	LabelBuilder,
 	MessageFlags,
 } from "discord.js";
-import { Op } from "sequelize";
 import {
 	ButtonStyle,
 	ModalBuilder,
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
+import { db } from "@/app";
+import { messagesTable } from "@/db/models";
+import { and, eq } from "drizzle-orm";
 
 export const command: CommandData = {
 	name: "message",
@@ -77,18 +78,20 @@ export const command: CommandData = {
 export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
 	const focused = interaction.options.getFocused();
 	return await interaction.respond(
-		await Messages.findAll({
-			where: {
-				guild: interaction.guild?.id ?? "1",
-				name: { [Op.iLike]: `%${focused}%` },
-			},
-			limit: 25,
-		})
-			.catch(() => [])
+		await db
+			.select()
+			.from(messagesTable)
+			.where(
+				and(
+					eq(messagesTable.guild, interaction.guild?.id ?? "1"),
+					eq(messagesTable.name, focused),
+				),
+			)
+			.limit(25)
 			.then((results) =>
 				results.map((msg) => ({
-					name: msg.dataValues.name,
-					value: msg.dataValues.name,
+					name: msg.name,
+					value: msg.name,
 				})),
 			),
 	);
@@ -102,9 +105,12 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		const channel = interaction.options.getChannel("channel", true);
 
 		if (
-			await Messages.findOne({
-				where: { name: name, guild: interaction.guild?.id ?? "1" },
-			})
+			await db.select().from(messagesTable).where(
+				and(
+					eq(messagesTable.name, name),
+					eq(messagesTable.guild, interaction.guild?.id ?? "1"),
+				),
+			)
 		) {
 			return await interaction.editReply({
 				content:
@@ -199,7 +205,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 					});
 				}
 
-				await Messages.create({
+				await db.insert(messagesTable).values({
 					name: name,
 					guild: submittedModal.guild?.id ?? "1",
 					channel: channel.id,
@@ -226,9 +232,12 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	} else if (subcommand === "edit") {
 		const name = interaction.options.getString("name", true);
 
-		const messageEntry = await Messages.findOne({
-			where: { name: name, guild: interaction.guild?.id ?? "1" },
-		});
+		const messageEntry = await db.select().from(messagesTable).where(
+			and(
+				eq(messagesTable.name, name),
+				eq(messagesTable.guild, interaction.guild?.id ?? "1"),
+			),
+		).get();
 		if (!messageEntry) {
 			return await interaction.editReply({
 				content: `:x: No message found with the name "${name}"`,
@@ -236,7 +245,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const channel = await interaction.guild?.channels.cache.get(
-			messageEntry.dataValues.channel,
+			messageEntry.channel,
 		);
 		if (!channel || !channel.isTextBased()) {
 			return await interaction.editReply({
@@ -246,7 +255,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const targetMessage = await channel.messages
-			.fetch(messageEntry.dataValues.discordid)
+			.fetch(messageEntry.discordid)
 			.catch(() => null);
 		if (!targetMessage) {
 			return await interaction.editReply({
@@ -302,7 +311,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 					Cancel Edit
 				</Button>
 			</ActionRow>
-		)
+		);
 
 		let editResponse;
 		try {
@@ -348,9 +357,12 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	} else if (subcommand === "delete") {
 		const name = interaction.options.getString("name", true);
 
-		const messageEntry = await Messages.findOne({
-			where: { name: name, guild: interaction.guild?.id ?? "1" },
-		});
+		const messageEntry = await db.select().from(messagesTable).where(
+			and(
+				eq(messagesTable.name, name),
+				eq(messagesTable.guild, interaction.guild?.id ?? "1"),
+			),
+		).get();
 		if (!messageEntry) {
 			return await interaction.editReply({
 				content: `:x: No message found with the name "${name}"`,
@@ -358,7 +370,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const channel = await interaction.guild?.channels.cache.get(
-			messageEntry.dataValues.channel,
+			messageEntry.channel,
 		);
 		if (!channel || !channel.isTextBased()) {
 			return await interaction.editReply({
@@ -368,13 +380,16 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const targetMessage = await channel.messages
-			.fetch(messageEntry.dataValues.discordid)
+			.fetch(messageEntry.discordid)
 			.catch(() => null);
 
 		try {
-			await Messages.destroy({
-				where: { name: name, guild: interaction.guild?.id ?? "1" },
-			});
+			await db.delete(messagesTable).where(
+				and(
+					eq(messagesTable.name, name),
+					eq(messagesTable.guild, interaction.guild?.id ?? "1"),
+				),
+			);
 		} catch (error) {
 			Logger.error(`Failed to delete the message: ${error}`);
 			return await interaction.editReply({

@@ -1,4 +1,3 @@
-import { Embeds } from "@/db/models";
 import {
 	CommandData,
 	ChatInputCommand,
@@ -22,6 +21,9 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
+import { db } from "@/app";
+import { embedsTable } from "@/db/models";
+import { and, eq } from "drizzle-orm";
 
 export const command: CommandData = {
 	name: "embed",
@@ -114,19 +116,17 @@ export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
 	const focused = interaction.options.getFocused();
 	return await interaction.respond(
 		(
-			await Embeds.findAll({
-				where: { guild: interaction.guild?.id ?? "1" },
-			})
+			await db.select().from(embedsTable).where(eq(embedsTable.guild, interaction.guild?.id ?? "1"))
 		)
 			.filter((embed) =>
-				embed.dataValues.name
+				embed.name
 					.toLowerCase()
 					.includes(focused.toLowerCase()),
 			)
 			.slice(0, 25)
 			.map((embed) => ({
-				name: embed.dataValues.name,
-				value: embed.dataValues.name,
+				name: embed.name,
+				value: embed.name,
 			})),
 	);
 };
@@ -143,9 +143,12 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		const image = interaction.options.getAttachment("image");
 
 		if (
-			await Embeds.findOne({
-				where: { name: name, guild: interaction.guild?.id ?? "1" },
-			})
+			await db.select().from(embedsTable).where(
+				and(
+					eq(embedsTable.name, name),
+					eq(embedsTable.guild, interaction.guild?.id ?? "1"),
+				)
+			).get()
 		) {
 			return await interaction.editReply({
 				content:
@@ -290,11 +293,17 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 						});
 					}
 
-					await Embeds.create({
+					await db.insert(embedsTable).values({
 						name: name,
 						guild: submittedModalInteraction.guild?.id ?? "1",
 						channel: channel.id,
 						discordid: sent.id,
+						title: title ?? null,
+						description: description ?? null,
+						color: colorResolved
+							? colorResolved.toString()
+							: null,
+						image: image ? image.url : null,
 					});
 
 					await confirmation.update({
@@ -323,9 +332,12 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		const color = interaction.options.getString("color");
 		const newImage = interaction.options.getAttachment("image");
 
-		const embedEntry = await Embeds.findOne({
-			where: { name: name, guild: interaction.guild?.id ?? "1" },
-		});
+		const embedEntry = await db.select().from(embedsTable).where(
+			and(
+				eq(embedsTable.name, name),
+				eq(embedsTable.guild, interaction.guild?.id ?? "1"),
+			)
+		).get();
 		if (!embedEntry) {
 			return await interaction.editReply({
 				content: `:x: No embed found with the name "${name}"`,
@@ -333,7 +345,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const channel = await interaction.guild?.channels.cache.get(
-			embedEntry.dataValues.channel,
+			embedEntry.channel,
 		);
 		if (!channel || !channel.isTextBased()) {
 			return await interaction.editReply({
@@ -343,7 +355,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const targetMessage = await channel.messages
-			.fetch(embedEntry.dataValues.discordid)
+			.fetch(embedEntry.discordid)
 			.catch(() => null);
 		if (!targetMessage) {
 			return await interaction.editReply({
@@ -488,9 +500,12 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	} else if (subcommand === "delete") {
 		const name = interaction.options.getString("name", true);
 
-		const embedEntry = await Embeds.findOne({
-			where: { name: name, guild: interaction.guild?.id },
-		});
+		const embedEntry = await db.select().from(embedsTable).where(
+			and(
+				eq(embedsTable.name, name),
+				eq(embedsTable.guild, interaction.guild?.id ?? "1"),
+			)
+		).get()
 		if (!embedEntry) {
 			return await interaction.editReply({
 				content: `:x: No embed found with the name "${name}"`,
@@ -498,7 +513,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const channel = await interaction.guild?.channels.cache.get(
-			embedEntry.dataValues.channel,
+			embedEntry.channel,
 		);
 		if (!channel || !channel.isTextBased()) {
 			return await interaction.editReply({
@@ -508,11 +523,16 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const targetMessage = await channel.messages
-			.fetch(embedEntry.dataValues.discordid)
+			.fetch(embedEntry.discordid)
 			.catch(() => null);
 
 		try {
-			await embedEntry.destroy();
+			await db.delete(embedsTable).where(
+				and(
+					eq(embedsTable.name, name),
+					eq(embedsTable.guild, interaction.guild?.id ?? "1"),
+				)
+			);
 		} catch (error) {
 			Logger.error(`Failed to delete the embed: ${error}`);
 			return await interaction.editReply({

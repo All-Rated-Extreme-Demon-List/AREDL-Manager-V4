@@ -1,14 +1,10 @@
 import { Client } from "discord.js";
-import { Sequelize } from "sequelize-typescript";
+import "dotenv/config";
+import { drizzle } from "drizzle-orm/libsql";
 
-export const db = new Sequelize({
-  dialect: "sqlite",
-  logging: false,
-  storage: "file:./data/database.sqlite",
-  models: [__dirname + "/db/models"]
-});
+export const db = drizzle(process.env.DB_FILE_NAME!);
 
 const client = new Client({
-  intents: ["Guilds", "GuildMembers", "GuildMessages", "MessageContent"],
+	intents: ["Guilds", "GuildMembers", "GuildMessages", "MessageContent"],
 });
 export default client;
