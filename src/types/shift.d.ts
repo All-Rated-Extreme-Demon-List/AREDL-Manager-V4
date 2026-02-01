@@ -11,3 +11,7 @@ export interface Shift {
 	end_at: Date;
 	status: ShiftStatus;
 }
+
+export interface WebsocketShift extends Omit<Shift, 'user'> {
+	user_id: string;
+}

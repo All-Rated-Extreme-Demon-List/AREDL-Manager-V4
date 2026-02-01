@@ -1,4 +1,4 @@
-import { EmbedBuilder, SendableChannels } from "discord.js";
+import { EmbedBuilder, SendableChannels, TextChannel } from "discord.js";
 import { shiftsStartedID } from "@/../config.json";
 import { Logger } from "commandkit";
 import { User } from "@/types/user";
@@ -8,9 +8,8 @@ import { shiftNotificationsTable, settingsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const sendShiftNotif = async (
-	channel: SendableChannels,
+	channel: TextChannel,
 	shift: typeof shiftNotificationsTable.$inferSelect,
-	shiftID: number,
 ) => {
 	if (!shiftsStartedID) return 0;
 	try {
@@ -24,7 +23,7 @@ export const sendShiftNotif = async (
 			);
 			await db
 				.delete(shiftNotificationsTable)
-				.where(eq(shiftNotificationsTable.id, shiftID));
+				.where(eq(shiftNotificationsTable.id, shift.id));
 			return 1;
 		}
 		let pingStr;
@@ -59,9 +58,9 @@ export const sendShiftNotif = async (
 			.setTimestamp();
 
 		await channel.send({ content: pingStr, embeds: [archiveEmbed] });
-		await db.delete(shiftNotificationsTable).where(eq(shiftNotificationsTable.id, shiftID));
+		await db.delete(shiftNotificationsTable).where(eq(shiftNotificationsTable.id, shift.id));
 		Logger.info(
-			`Successfully sent and deleted shift notification (ID: ${shiftID})`,
+			`Successfully sent and deleted shift notification (ID: ${shift.id})`,
 		);
 		return 0;
 	} catch (e) {
@@ -70,13 +69,13 @@ export const sendShiftNotif = async (
 		);
 		Logger.error(shift);
 		try {
-			await db.delete(shiftNotificationsTable).where(eq(shiftNotificationsTable.id, shiftID));
+			await db.delete(shiftNotificationsTable).where(eq(shiftNotificationsTable.id, shift.id));
 			Logger.info(
-				`Deleted shift notification after error (ID: ${shiftID})`,
+				`Deleted shift notification after error (ID: ${shift.id})`,
 			);
 		} catch (deleteErr) {
 			Logger.error(
-				`Failed to delete shift notification (ID: ${shiftID}) after error:`,
+				`Failed to delete shift notification (ID: ${shift.id}) after error:`,
 			);
 			Logger.error(deleteErr);
 		}
