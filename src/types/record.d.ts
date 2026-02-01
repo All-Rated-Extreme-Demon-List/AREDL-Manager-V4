@@ -2,6 +2,8 @@ import { PaginatedResponse } from "./api";
 import { BaseLevel, Level } from "./level";
 import { BaseUser, Clan, User } from "./user";
 
+type SubmissionStatus = "Pending" | "Claimed" | "UnderConsideration" | "Denied" | "Accepted" | "UnderReview"
+
 export interface RecordBase {
 	id: string;
 	mobile: boolean;
@@ -41,4 +43,25 @@ export interface LeaderboardEntryData {
 
 export interface LeaderboardEntry extends PaginatedResponse<LeaderboardEntryData> {
     last_refreshed: string;
+}
+
+export interface Submission {
+	id: string;
+	level: Level;
+	submitted_by: User;
+	mobile: boolean;
+	ldm_id?: number;
+	video_url: string;
+	raw_url?: string;
+	mod_menu?: string;
+	status: SubmissionStatus;
+	reviewer?: User;
+	private_reviewer_notes?: string;
+	priority: boolean;
+	reviewer_notes?: string;
+	user_notes?: string;
+	locked: boolean;
+	priority_value: number;
+	created_at: Date;
+	updated_at: Date;
 }

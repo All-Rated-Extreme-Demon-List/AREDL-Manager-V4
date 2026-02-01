@@ -43,7 +43,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 	if (sub === "servertraffic") {
 		const minDate = new Date(
-			new Date().getDate() - 30 * 24 * 60 * 60 * 1000,
+			new Date().getTime() - 30 * 24 * 60 * 60 * 1000,
 		);
 
 		const statsData = await db

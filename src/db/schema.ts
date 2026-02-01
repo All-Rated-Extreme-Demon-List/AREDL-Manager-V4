@@ -44,6 +44,7 @@ export const shiftNotificationsTable = sqliteTable("shiftReminders", {
 })
 
 export const infoMessagesTable = sqliteTable("info_messages", {
+	id: int().primaryKey({ autoIncrement: true }),
 	name: text().primaryKey(),
 	guild: text().notNull(),
 	channel: text().notNull(),
