@@ -22,11 +22,13 @@ import { eq } from "drizzle-orm";
 export const notification_type = "SUBMISSION_UNDER_CONSIDERATION";
 
 export const handle = async (
-	client: Client<true>,
-	data: UnresolvedSubmission,
+	client: Client,
+	db: any,
+	config: any,
+	data: UnresolvedSubmission
 ) => {
-	Logger.log("Received submission under consideration notification:");
-	Logger.log(data);
+	Logger.info("Received submission under consideration notification:");
+	Logger.info(data);
 
 	const isPlat = "completion_time" in data && data.completion_time !== null;
 
@@ -34,7 +36,7 @@ export const handle = async (
 		await Promise.all([
 			api.send<ExtendedLevel>(
 				`${isPlat ? "/arepl" : "/aredl"}/levels/${data.level_id}`,
-				"GET",
+				"GET"
 			),
 			api.send<User>(`/users/${data.submitted_by}`, "GET"),
 			data.reviewer_id
@@ -44,20 +46,20 @@ export const handle = async (
 
 	if (levelResponse.error) {
 		Logger.error(
-			`Error fetching level data: ${levelResponse.data.message}`,
+			`Error fetching level data: ${levelResponse.data.message}`
 		);
 		return;
 	}
 
 	if (submitterResponse.error) {
 		Logger.error(
-			`Error fetching user data: ${submitterResponse.data.message}`,
+			`Error fetching user data: ${submitterResponse.data.message}`
 		);
 		return;
 	}
 	if (reviewerResponse?.error) {
 		Logger.error(
-			`Error fetching reviewer data: ${reviewerResponse.data?.message}`,
+			`Error fetching reviewer data: ${reviewerResponse.data?.message}`
 		);
 		return;
 	}
@@ -141,7 +143,7 @@ export const handle = async (
 		: guild;
 
 	const channel = staffGuild.channels.cache.get(
-		isPlat ? platArchiveRecordsID : classicArchiveRecordsID,
+		isPlat ? platArchiveRecordsID : classicArchiveRecordsID
 	);
 	if (channel && channel.isSendable()) {
 		await channel.send({
@@ -221,5 +223,5 @@ export const handle = async (
 		submission_id: submissionId,
 		message_id: sentUCMessage.id,
 		thread_id: thread.id,
-	})
+	});
 };

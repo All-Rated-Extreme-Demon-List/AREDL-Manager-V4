@@ -3,22 +3,22 @@ import { LevelRecord } from "./record";
 import { BaseLevel, Pack } from "./level";
 
 export interface BaseUser {
-    id: string;
-    username: string;
-    global_name: string;
+	id: string;
+	username: string;
+	global_name: string;
 }
 
 export interface User extends BaseUser {
-    country?: number;
-    discord_id?: string;
-    discord_avatar?: string;
+	country?: number;
+	discord_id?: string;
+	discord_avatar?: string;
 }
 
 export interface Clan {
-    id: string;
-    global_name: string;
-    tag: string;
-    description?: string;
+	id: string;
+	global_name: string;
+	tag: string;
+	description?: string;
 }
 
 export interface Role {
@@ -33,8 +33,8 @@ export interface Profile extends User {
 	description?: string;
 	ban_level: number;
 	background_level: number;
-	clan?: Clan,
-	roles: Role[]
+	clan?: Clan;
+	roles: Role[];
 	rank: {
 		rank: number;
 		raw_rank: number;
@@ -50,5 +50,4 @@ export interface Profile extends User {
 	records: LevelRecord[];
 	created: BaseLevel[];
 	published: BaseLevel[];
-	
 }

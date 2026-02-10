@@ -43,7 +43,6 @@ interface Series {
 	reviewed: number[];
 }
 
-
 interface StaffSeries extends Omit<Series, "reviewed"> {
 	accepted: number[];
 	denied: number[];
@@ -57,7 +56,7 @@ export default task({
 		return true;
 	},
 	async execute({ client }) {
-		Logger.log("Scheduled - Sending info message updates");
+		Logger.info("Scheduled - Sending info message updates");
 
 		// helpers
 
@@ -72,7 +71,9 @@ export default task({
 		const safeNumber = (v: any, d = 0) =>
 			Number.isFinite(Number(v)) ? Number(v) : d;
 
-		const safeGetTotalRecords = (payload: ApiResponse<LevelStatistics[]>) => {
+		const safeGetTotalRecords = (
+			payload: ApiResponse<LevelStatistics[]>
+		) => {
 			try {
 				if (
 					Array.isArray(payload?.data) &&
@@ -86,7 +87,10 @@ export default task({
 
 		const sortAndLimitDays = (arr: DailyStatistics[], n = 30) =>
 			[...arr]
-				.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+				.sort(
+					(a, b) =>
+						new Date(a.date).getTime() - new Date(b.date).getTime()
+				)
 				.slice(-n);
 
 		const computeStaffStats = (days: DailyStatistics[]) => {
@@ -121,7 +125,7 @@ export default task({
 				(d) =>
 					safeNumber(d.accepted) +
 					safeNumber(d.denied) +
-					safeNumber(d.under_consideration),
+					safeNumber(d.under_consideration)
 			);
 			const totalSubmitted = submitted.reduce((a, b) => a + b, 0);
 			const totalReviewed = reviewed.reduce((a, b) => a + b, 0);
@@ -139,7 +143,11 @@ export default task({
 			};
 		};
 
-		const renderStaffChart = async (title: string, labels: Date[], series: StaffSeries) => {
+		const renderStaffChart = async (
+			title: string,
+			labels: Date[],
+			series: StaffSeries
+		) => {
 			return renderer.renderToBuffer({
 				type: "bar",
 				data: {
@@ -187,7 +195,11 @@ export default task({
 			});
 		};
 
-		const renderPublicChart = async (title: string, labels: Date[], series: Series) => {
+		const renderPublicChart = async (
+			title: string,
+			labels: Date[],
+			series: Series
+		) => {
 			return renderer.renderToBuffer({
 				type: "bar",
 				data: {
@@ -227,7 +239,7 @@ export default task({
 			totals: StaffTotals,
 			queue: SubmissionQueue | null,
 			totalRecords: number,
-			chartName: string,
+			chartName: string
 		) => {
 			const oldestDate = queue?.oldest_submission
 				? `<t:${Math.floor(new Date(queue.oldest_submission).getTime() / 1000)}:F>`
@@ -235,7 +247,7 @@ export default task({
 
 			const blocks = [
 				new TextDisplayBuilder().setContent(
-					`## ${name} List Statistics`,
+					`## ${name} List Statistics`
 				),
 				new TextDisplayBuilder().setContent(
 					"**Total records count:** " +
@@ -243,29 +255,29 @@ export default task({
 						"\n### Current Queue\n" +
 						`**:blue_square: Pending submissions:** ${queue?.submissions_in_queue ?? 0}\t` +
 						`**:hourglass: Under Consideration submissions:** ${queue?.uc_submissions ?? 0}\n\n` +
-						`**:clock1: Oldest submission date:** ${oldestDate}`,
+						`**:clock1: Oldest submission date:** ${oldestDate}`
 				),
 				new TextDisplayBuilder().setContent(
 					"### Last 31 Days\n" +
 						`**:blue_square: New submissions:** ${totals.totalSubmitted}\n\n` +
 						`**:white_check_mark: Accepted:** ${totals.totalAccepted}\t` +
 						`**:x: Denied:** ${totals.totalDenied}\t` +
-						`**:hourglass: Under Consideration:** ${totals.totalUnderConsideration}`,
+						`**:hourglass: Under Consideration:** ${totals.totalUnderConsideration}`
 				),
 				new TextDisplayBuilder().setContent(
 					`**Average new submissions per day:** ${totals.avgSubmittedPerDay}\n` +
-						`**Average checked submissions per day:** ${totals.avgCheckedPerDay}`,
+						`**Average checked submissions per day:** ${totals.avgCheckedPerDay}`
 				),
 			];
 
 			const gallery = new MediaGalleryBuilder().addItems((item) =>
 				item
 					.setDescription(`${name} submissions (last 31 days)`)
-					.setURL(`attachment://${chartName}`),
+					.setURL(`attachment://${chartName}`)
 			);
 
 			const container = new ContainerBuilder().setAccentColor(
-				accentColor,
+				accentColor
 			);
 			for (const b of blocks) {
 				container
@@ -282,38 +294,38 @@ export default task({
 			totals: Totals,
 			queue: SubmissionQueue | null,
 			totalRecords: number,
-			chartName: string,
+			chartName: string
 		) => {
 			const blocks = [
 				new TextDisplayBuilder().setContent(
-					`## ${name} List Statistics`,
+					`## ${name} List Statistics`
 				),
 				new TextDisplayBuilder().setContent(
 					"**Total records count:** " +
 						totalRecords +
 						"\n### Current Queue\n" +
 						`**:blue_square: Pending submissions:** ${queue?.submissions_in_queue ?? 0}\t` +
-						`**:hourglass: Under Consideration submissions:** ${queue?.uc_submissions ?? 0}\n\n`,
+						`**:hourglass: Under Consideration submissions:** ${queue?.uc_submissions ?? 0}\n\n`
 				),
 				new TextDisplayBuilder().setContent(
 					"### Last 31 Days\n" +
 						`**:blue_square: New submissions:** ${totals.totalSubmitted}\n\n` +
-						`**:white_check_mark: Reviewed:** ${totals.totalReviewed}`,
+						`**:white_check_mark: Reviewed:** ${totals.totalReviewed}`
 				),
 				new TextDisplayBuilder().setContent(
 					`**Average new submissions per day:** ${totals.avgSubmittedPerDay}\n` +
-						`**Average reviewed submissions per day:** ${totals.avgReviewedPerDay}`,
+						`**Average reviewed submissions per day:** ${totals.avgReviewedPerDay}`
 				),
 			];
 
 			const gallery = new MediaGalleryBuilder().addItems((item) =>
 				item
 					.setDescription(`${name} submissions (last 31 days)`)
-					.setURL(`attachment://${chartName}`),
+					.setURL(`attachment://${chartName}`)
 			);
 
 			const container = new ContainerBuilder().setAccentColor(
-				accentColor,
+				accentColor
 			);
 			for (const b of blocks) {
 				container
@@ -324,28 +336,36 @@ export default task({
 			return container;
 		};
 
-		const fetchMessage = async (entry: typeof infoMessagesTable.$inferSelect) => {
-            try {
-                const channel = await client.channels.fetch(entry.channel);
-                if (!channel || !channel.isTextBased?.())
-                    throw new Error('Channel not found or not text-based');
-                const message = await channel.messages.fetch(entry.discordid);
-                return message;
-            } catch (err: any) {
-                const code = err?.code || err?.rawError?.code;
-                if (code === 10008 || code === 10003) {
-                    Logger.warn('Scheduled - Info message no longer exists.');
-                } else {
-                    Logger.warn(
-                        `Scheduled - Could not fetch message to update. Error: ${err?.message || err}`,
-                    );
-                }
-				await db.delete(infoMessagesTable).where(eq(infoMessagesTable.id, entry.id));
-                return null;
-            }
-        };
+		const fetchMessage = async (
+			entry: typeof infoMessagesTable.$inferSelect
+		) => {
+			try {
+				const channel = await client.channels.fetch(entry.channel);
+				if (!channel || !channel.isTextBased?.())
+					throw new Error("Channel not found or not text-based");
+				const message = await channel.messages.fetch(entry.discordid);
+				return message;
+			} catch (err: any) {
+				const code = err?.code || err?.rawError?.code;
+				if (code === 10008 || code === 10003) {
+					Logger.warn("Scheduled - Info message no longer exists.");
+				} else {
+					Logger.warn(
+						`Scheduled - Could not fetch message to update. Error: ${err?.message || err}`
+					);
+				}
+				await db
+					.delete(infoMessagesTable)
+					.where(eq(infoMessagesTable.id, entry.id));
+				return null;
+			}
+		};
 
-		const updateIfExists = async (dbName: string, components: ContainerBuilder[], files: AttachmentBuilder[]) => {
+		const updateIfExists = async (
+			dbName: string,
+			components: ContainerBuilder[],
+			files: AttachmentBuilder[]
+		) => {
 			const entry = await db
 				.select()
 				.from(infoMessagesTable)
@@ -354,7 +374,7 @@ export default task({
 				.get();
 			if (!entry) {
 				Logger.info(
-					`Scheduled - No DB entry for '${dbName}' (nothing to update yet).`,
+					`Scheduled - No DB entry for '${dbName}' (nothing to update yet).`
 				);
 				return;
 			}
@@ -368,12 +388,12 @@ export default task({
 				files,
 			});
 			Logger.info(
-				`Scheduled - Updated statistics panel successfully (${dbName}).`,
+				`Scheduled - Updated statistics panel successfully (${dbName}).`
 			);
 		};
 
 		// fetch data
-		let [
+		const [
 			daily_stats_aredl,
 			daily_stats_arepl,
 			total_records_aredl,
@@ -385,37 +405,37 @@ export default task({
 				"/aredl/statistics/submissions/daily",
 				"GET",
 				{ per_page: 31, page: 1 },
-				undefined,
+				undefined
 			),
 			api.send<PaginatedResponse<DailyStatistics>>(
 				"/arepl/statistics/submissions/daily",
 				"GET",
 				{ per_page: 31, page: 1 },
-				undefined,
+				undefined
 			),
 			api.send<LevelStatistics[]>(
 				"/aredl/statistics/records",
 				"GET",
 				undefined,
-				undefined,
+				undefined
 			),
 			api.send<LevelStatistics[]>(
 				"/arepl/statistics/records",
 				"GET",
 				undefined,
-				undefined,
+				undefined
 			),
 			api.send<SubmissionQueue>(
 				"/aredl/submissions/queue",
 				"GET",
 				undefined,
-				undefined,
+				undefined
 			),
 			api.send<SubmissionQueue>(
 				"/arepl/submissions/queue",
 				"GET",
 				undefined,
-				undefined,
+				undefined
 			),
 		]);
 
@@ -431,12 +451,16 @@ export default task({
 				: [];
 		const aredl_total_records = safeGetTotalRecords(total_records_aredl);
 		const arepl_total_records = safeGetTotalRecords(total_records_arepl);
-		const aredl_queue = queue_aredl.error ? null : queue_aredl?.data ?? {};
-		const arepl_queue = queue_arepl.error ? null : queue_arepl?.data ?? {};
+		const aredl_queue = queue_aredl.error
+			? null
+			: (queue_aredl?.data ?? {});
+		const arepl_queue = queue_arepl.error
+			? null
+			: (queue_arepl?.data ?? {});
 
 		if (!aredl_daily.length && !arepl_daily.length) {
 			Logger.warn(
-				"Scheduled - No stats returned for either list; nothing to update.",
+				"Scheduled - No stats returned for either list; nothing to update."
 			);
 			return;
 		}
@@ -450,8 +474,8 @@ export default task({
 			? sortAndLimitDays(arepl_daily, 30)
 			: [];
 
-		let staffFiles = [];
-		let staffComponents: ContainerBuilder[] = [];
+		const staffFiles = [];
+		const staffComponents: ContainerBuilder[] = [];
 
 		if (aredlLast30.length || areplLast30.length) {
 			const aredlStaff = aredlLast30.length
@@ -468,11 +492,11 @@ export default task({
 				const chart = await renderStaffChart(
 					"Classic — Submission Statistics (last 30 days)",
 					aredlStaff.labels,
-					aredlStaff.series,
+					aredlStaff.series
 				);
 				const fileName = "aredl-stats.png";
 				staffFiles.push(
-					new AttachmentBuilder(chart, { name: fileName }),
+					new AttachmentBuilder(chart, { name: fileName })
 				);
 				mainAredlContainer = buildStaffContainer(
 					0xff6f00,
@@ -480,7 +504,7 @@ export default task({
 					aredlStaff.totals,
 					aredl_queue,
 					aredl_total_records,
-					fileName,
+					fileName
 				);
 			}
 
@@ -488,11 +512,11 @@ export default task({
 				const chart = await renderStaffChart(
 					"Platformer — Submission Statistics (last 30 days)",
 					areplStaff.labels,
-					areplStaff.series,
+					areplStaff.series
 				);
 				const fileName = "arepl-stats.png";
 				staffFiles.push(
-					new AttachmentBuilder(chart, { name: fileName }),
+					new AttachmentBuilder(chart, { name: fileName })
 				);
 				mainAreplContainer = buildStaffContainer(
 					223,
@@ -500,7 +524,7 @@ export default task({
 					areplStaff.totals,
 					arepl_queue,
 					arepl_total_records,
-					fileName,
+					fileName
 				);
 			}
 
@@ -509,8 +533,8 @@ export default task({
 		}
 
 		// prepare public
-		let publicFiles = [];
-		let publicComponents = [];
+		const publicFiles = [];
+		const publicComponents = [];
 
 		if (aredlLast30.length || areplLast30.length) {
 			const aredlPublic = aredlLast30.length
@@ -527,11 +551,11 @@ export default task({
 				const chart = await renderPublicChart(
 					"Classic — Submissions vs Reviewed (last 30 days)",
 					aredlPublic.labels,
-					aredlPublic.series,
+					aredlPublic.series
 				);
 				const fileName = "aredl-stats-public.png";
 				publicFiles.push(
-					new AttachmentBuilder(chart, { name: fileName }),
+					new AttachmentBuilder(chart, { name: fileName })
 				);
 				mainAredlContainerPub = buildPublicContainer(
 					0xff6f00,
@@ -539,7 +563,7 @@ export default task({
 					aredlPublic.totals,
 					aredl_queue,
 					aredl_total_records,
-					fileName,
+					fileName
 				);
 			}
 
@@ -547,11 +571,11 @@ export default task({
 				const chart = await renderPublicChart(
 					"Platformer — Submissions vs Reviewed (last 30 days)",
 					areplPublic.labels,
-					areplPublic.series,
+					areplPublic.series
 				);
 				const fileName = "arepl-stats-public.png";
 				publicFiles.push(
-					new AttachmentBuilder(chart, { name: fileName }),
+					new AttachmentBuilder(chart, { name: fileName })
 				);
 				mainAreplContainerPub = buildPublicContainer(
 					223,
@@ -559,7 +583,7 @@ export default task({
 					areplPublic.totals,
 					arepl_queue,
 					arepl_total_records,
-					fileName,
+					fileName
 				);
 			}
 			if (mainAredlContainerPub)
@@ -574,7 +598,7 @@ export default task({
 		await updateIfExists(
 			"list_stats_public",
 			publicComponents,
-			publicFiles,
+			publicFiles
 		);
 
 		Logger.info("Scheduled - Completed statistics updates.");

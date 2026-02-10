@@ -1,102 +1,116 @@
-import { Client } from "@/app"
-import path from "path";
-import fs from "fs";
-import { Logger } from "commandkit";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import { websocketURL } from "@/../config.json";
+import { Collection, Client } from "discord.js";
 import WebSocket from "ws";
+import type { WebsocketHandler } from "../types/websocket.d";
+import { isWebsocketHandler } from "../types/websocket.d";
+import { Logger } from "commandkit";
+import { handlers } from "../app/websocket/index";
 
-// Define the websocket handler interface
-export interface WebsocketHandler {
-    notification_type: string;
-    handle: (client: Client, data: any) => Promise<void> | void;
-}
+/**
+ * Load all WebSocket handlers from the websocket index
+ * and store them in client.websockets Collection
+ */
+export async function initWebsocket(client: Client): Promise<void> {
+	Logger.info(`[WebSocket] Loading ${handlers.length} handler(s)...`);
 
-// Type guard to validate the handler
-function isWebsocketHandler(obj: any): obj is WebsocketHandler {
-    return (
-        typeof obj === 'object' &&
-        obj !== null &&
-        typeof obj.notification_type === 'string' &&
-        typeof obj.handle === 'function'
-    );
-}
-
-export const initWebsocket = async (client: Client) => {
-	// Initialize WebSocket handlers
-	const __filename = fileURLToPath(import.meta.url);
-	const __dirname = dirname(__filename);
-	const websocketsPath = path.join(__dirname, '..', 'app', 'websocket');
-	if (fs.existsSync(websocketsPath)) {
-		const websocketsFiles = fs
-			.readdirSync(websocketsPath)
-			.filter((file) => file.endsWith('.ws.ts'));
-
-		Logger.info(`Loading ${websocketsFiles.length} websocket handlers...`);
-		
-		for (const file of websocketsFiles) {
-			try {
-				const websocketHandler = await import('../app/websocket/' + file).then((module) => module.default);
-				
-				if (!isWebsocketHandler(websocketHandler)) {
-					Logger.warn(`Invalid websocket handler in websocket/${file}: missing notification_type or handle`);
-					continue;
-				}
-				
-				client.websockets.set(websocketHandler.notification_type, websocketHandler);
-				Logger.info(`    Loaded ${websocketHandler.notification_type} from websocket/${file}`);
-			} catch (error) {
-				Logger.error(`Failed to load websocket handler from websocket/${file}:`);
-				Logger.error(error)
-			}
-		}
-	} else {
-		Logger.error("Failed to load websocket handlers: websocket path does not exist")
-		Logger.error(`Path: ${websocketsPath}`)
-	}
-}
-
-export const initAPIWebsocket = async (client: Client) => {
-	Logger.info('Initializing API WebSocket connection...');
-	const ws = new WebSocket(websocketURL, {
-		headers: { Authorization: `Bearer ${process.env.API_TOKEN!}` },
-	});
-
-	await new Promise<void>((resolve, reject) => {
-		ws.once('open', () => {
-			Logger.info('Connected to notifications WebSocket');
-			resolve();
-		});
-
-		ws.once('error', (err) => {
-			Logger.error('WebSocket connection error:');
-			Logger.error(err)
-			reject(err);
-		});
-	});
-
-	ws.on('message', (data) => {
+	for (const handler of handlers) {
 		try {
-			const parsed_data = JSON.parse(data.toString());
-			client.websockets.forEach((handler: WebsocketHandler, type: string) => {
-				if (parsed_data.notification_type === type) {
-					handler.handle(client, parsed_data.data);
+			if (isWebsocketHandler(handler)) {
+				client.websockets.set(handler.notification_type, handler);
+				Logger.info(
+					`[WebSocket] Loaded handler: ${handler.notification_type}`
+				);
+			} else {
+				Logger.warn(`[WebSocket] Invalid handler format`);
+			}
+		} catch (error) {
+			Logger.error(`[WebSocket] Error loading handler:`);
+			Logger.error(error);
+		}
+	}
+
+	Logger.info(
+		`[WebSocket] Successfully loaded ${client.websockets.size} handler(s)`
+	);
+}
+
+/**
+ * Connect to the API WebSocket and route incoming messages to handlers
+ */
+export async function initAPIWebsocket(
+	client: Client,
+	db: any,
+	config: any
+): Promise<void> {
+	const apiToken = `Bearer ${process.env.API_TOKEN}`;
+	const wsUrl =
+		config.websocketURL ||
+		"wss://api.aredl.net/v2dev/api/notifications/websocket";
+
+	if (!apiToken) {
+		Logger.error(
+			"[WebSocket] API_TOKEN not found in environment variables"
+		);
+		return;
+	}
+
+	function connectWebSocket(): void {
+		try {
+			const ws = new WebSocket(wsUrl, {
+				headers: {
+					Authorization: apiToken,
+				},
+			});
+
+			ws.on("open", () => {
+				Logger.info("[WebSocket] Connected to API WebSocket");
+			});
+
+			ws.on("message", async (data: WebSocket.Data) => {
+				try {
+					const message = JSON.parse(data.toString());
+					const notificationType = message.notification_type;
+
+					if (!notificationType) {
+						Logger.warn(
+							"[WebSocket] Message missing notification_type:"
+						);
+						Logger.warn(message);
+						return;
+					}
+
+					const handler = client.websockets.get(notificationType);
+
+					if (!handler) {
+						Logger.warn(
+							`[WebSocket] No handler found for notification_type: ${notificationType}`
+						);
+						return;
+					}
+
+					await handler.handle(client, db, config, message);
+				} catch (error) {
+					Logger.error("[WebSocket] Error processing message:");
+					Logger.error(error);
 				}
 			});
-		} catch (err) {
-			Logger.error('Failed to parse websocket message:');
-			Logger.error(err);
-		}
-	});
 
-	ws.on('close', (code, reason) => {
-		Logger.warn(
-			`Websocket closed (${code}): ${reason}. Reconnecting in 5s…`,
-		);
-		setTimeout(
-			() => module.exports.initAPIWebsocket(client, process.env.API_TOKEN!),
-			5000,
-		);
-	});
+			ws.on("error", (error) => {
+				Logger.error("[WebSocket] Error:");
+				Logger.error(error);
+			});
+
+			ws.on("close", () => {
+				Logger.info(
+					"[WebSocket] Disconnected from API WebSocket. Reconnecting in 5 seconds..."
+				);
+				setTimeout(connectWebSocket, 5000);
+			});
+		} catch (error) {
+			Logger.error("[WebSocket] Failed to connect:");
+			Logger.error(error);
+			setTimeout(connectWebSocket, 5000);
+		}
+	}
+
+	connectWebSocket();
 }

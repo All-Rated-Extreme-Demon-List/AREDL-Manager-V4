@@ -9,17 +9,17 @@ import { eq } from "drizzle-orm";
 
 export const sendShiftNotif = async (
 	channel: TextChannel,
-	shift: typeof shiftNotificationsTable.$inferSelect,
+	shift: typeof shiftNotificationsTable.$inferSelect
 ) => {
 	if (!shiftsStartedID) return 0;
 	try {
 		const reviewerResponse = await api.send<User>(
 			`/users/${shift.user_id}`,
-			"GET",
+			"GET"
 		);
 		if (reviewerResponse.error) {
 			Logger.error(
-				`Shift Notification - Error fetching reviewer ${shift.user_id}: ${reviewerResponse.data.message}`,
+				`Shift Notification - Error fetching reviewer ${shift.user_id}: ${reviewerResponse.data.message}`
 			);
 			await db
 				.delete(shiftNotificationsTable)
@@ -31,9 +31,7 @@ export const sendShiftNotif = async (
 			const settings = await db
 				.select()
 				.from(settingsTable)
-				.where(
-					eq(settingsTable.user, reviewerResponse.data.discord_id),
-				)
+				.where(eq(settingsTable.user, reviewerResponse.data.discord_id))
 				.limit(1)
 				.get();
 			if (!settings || settings.shiftPings === true) {
@@ -48,7 +46,7 @@ export const sendShiftNotif = async (
 			.setColor(0x8fce00)
 			.setTitle(`:white_check_mark: Shift started!`)
 			.setDescription(
-				`${reviewerResponse.data.discord_id ? `<@${reviewerResponse.data.discord_id}>` : reviewerResponse.data.global_name}`,
+				`${reviewerResponse.data.discord_id ? `<@${reviewerResponse.data.discord_id}>` : reviewerResponse.data.global_name}`
 			)
 			.addFields([
 				{ name: "Count", value: `${shift.target_count} records` },
@@ -58,24 +56,28 @@ export const sendShiftNotif = async (
 			.setTimestamp();
 
 		await channel.send({ content: pingStr, embeds: [archiveEmbed] });
-		await db.delete(shiftNotificationsTable).where(eq(shiftNotificationsTable.id, shift.id));
+		await db
+			.delete(shiftNotificationsTable)
+			.where(eq(shiftNotificationsTable.id, shift.id));
 		Logger.info(
-			`Successfully sent and deleted shift notification (ID: ${shift.id})`,
+			`Successfully sent and deleted shift notification (ID: ${shift.id})`
 		);
 		return 0;
 	} catch (e) {
 		Logger.error(
-			`Shift Notification - Error sending shift notification: ${e}`,
+			`Shift Notification - Error sending shift notification: ${e}`
 		);
 		Logger.error(shift);
 		try {
-			await db.delete(shiftNotificationsTable).where(eq(shiftNotificationsTable.id, shift.id));
+			await db
+				.delete(shiftNotificationsTable)
+				.where(eq(shiftNotificationsTable.id, shift.id));
 			Logger.info(
-				`Deleted shift notification after error (ID: ${shift.id})`,
+				`Deleted shift notification after error (ID: ${shift.id})`
 			);
 		} catch (deleteErr) {
 			Logger.error(
-				`Failed to delete shift notification (ID: ${shift.id}) after error:`,
+				`Failed to delete shift notification (ID: ${shift.id}) after error:`
 			);
 			Logger.error(deleteErr);
 		}

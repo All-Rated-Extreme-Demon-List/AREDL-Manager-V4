@@ -5,7 +5,7 @@ import {
 	ChatInputCommand,
 	CommandData,
 	Logger,
-	CommandMetadata
+	CommandMetadata,
 } from "commandkit";
 import {
 	ApplicationCommandOptionType,
@@ -24,7 +24,7 @@ import { and, eq } from "drizzle-orm";
 import { guildId, staffGuildId } from "@/../config.json";
 import { commandGuilds } from "@/util/commandGuilds";
 
-export const metadata = commandGuilds()
+export const metadata = commandGuilds();
 
 export const command: CommandData = {
 	name: "message",
@@ -89,16 +89,16 @@ export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
 			.where(
 				and(
 					eq(messagesTable.guild, interaction.guild?.id ?? "1"),
-					eq(messagesTable.name, focused),
-				),
+					eq(messagesTable.name, focused)
+				)
 			)
 			.limit(25)
 			.then((results) =>
 				results.map((msg) => ({
 					name: msg.name,
 					value: msg.name,
-				})),
-			),
+				}))
+			)
 	);
 };
 
@@ -110,12 +110,15 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		const channel = interaction.options.getChannel("channel", true);
 
 		if (
-			await db.select().from(messagesTable).where(
-				and(
-					eq(messagesTable.name, name),
-					eq(messagesTable.guild, interaction.guild?.id ?? "1"),
-				),
-			)
+			await db
+				.select()
+				.from(messagesTable)
+				.where(
+					and(
+						eq(messagesTable.name, name),
+						eq(messagesTable.guild, interaction.guild?.id ?? "1")
+					)
+				)
 		) {
 			return await interaction.editReply({
 				content:
@@ -124,7 +127,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const channelResolved = await interaction.guild?.channels.cache.get(
-			channel.id,
+			channel.id
 		);
 		if (!channelResolved || !channelResolved.isSendable()) {
 			return await interaction.editReply({
@@ -145,9 +148,9 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 								.setLabel("Message Content")
 								.setStyle(TextInputStyle.Paragraph)
 								.setRequired(true)
-								.setMaxLength(2000),
-						),
-				),
+								.setMaxLength(2000)
+						)
+				)
 		);
 
 		const submittedModal = await interaction
@@ -237,12 +240,16 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	} else if (subcommand === "edit") {
 		const name = interaction.options.getString("name", true);
 
-		const messageEntry = await db.select().from(messagesTable).where(
-			and(
-				eq(messagesTable.name, name),
-				eq(messagesTable.guild, interaction.guild?.id ?? "1"),
-			),
-		).get();
+		const messageEntry = await db
+			.select()
+			.from(messagesTable)
+			.where(
+				and(
+					eq(messagesTable.name, name),
+					eq(messagesTable.guild, interaction.guild?.id ?? "1")
+				)
+			)
+			.get();
 		if (!messageEntry) {
 			return await interaction.editReply({
 				content: `:x: No message found with the name "${name}"`,
@@ -250,7 +257,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const channel = await interaction.guild?.channels.cache.get(
-			messageEntry.channel,
+			messageEntry.channel
 		);
 		if (!channel || !channel.isTextBased()) {
 			return await interaction.editReply({
@@ -282,9 +289,9 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 								.setStyle(TextInputStyle.Paragraph)
 								.setRequired(true)
 								.setMaxLength(2000)
-								.setValue(targetMessage.content),
-						),
-				),
+								.setValue(targetMessage.content)
+						)
+				)
 		);
 
 		const editSubmittedModal = await interaction
@@ -326,7 +333,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			});
 		} catch (error) {
 			Logger.error(
-				`Failed to create the edited message preview: ${error}`,
+				`Failed to create the edited message preview: ${error}`
 			);
 			return await editSubmittedModal.editReply({
 				content: `:x: Failed to create the edited message preview: ${error}`,
@@ -362,12 +369,16 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	} else if (subcommand === "delete") {
 		const name = interaction.options.getString("name", true);
 
-		const messageEntry = await db.select().from(messagesTable).where(
-			and(
-				eq(messagesTable.name, name),
-				eq(messagesTable.guild, interaction.guild?.id ?? "1"),
-			),
-		).get();
+		const messageEntry = await db
+			.select()
+			.from(messagesTable)
+			.where(
+				and(
+					eq(messagesTable.name, name),
+					eq(messagesTable.guild, interaction.guild?.id ?? "1")
+				)
+			)
+			.get();
 		if (!messageEntry) {
 			return await interaction.editReply({
 				content: `:x: No message found with the name "${name}"`,
@@ -375,7 +386,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		}
 
 		const channel = await interaction.guild?.channels.cache.get(
-			messageEntry.channel,
+			messageEntry.channel
 		);
 		if (!channel || !channel.isTextBased()) {
 			return await interaction.editReply({
@@ -389,12 +400,14 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			.catch(() => null);
 
 		try {
-			await db.delete(messagesTable).where(
-				and(
-					eq(messagesTable.name, name),
-					eq(messagesTable.guild, interaction.guild?.id ?? "1"),
-				),
-			);
+			await db
+				.delete(messagesTable)
+				.where(
+					and(
+						eq(messagesTable.name, name),
+						eq(messagesTable.guild, interaction.guild?.id ?? "1")
+					)
+				);
 		} catch (error) {
 			Logger.error(`Failed to delete the message: ${error}`);
 			return await interaction.editReply({

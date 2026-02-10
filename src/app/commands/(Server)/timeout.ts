@@ -57,7 +57,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 	if (!(interaction.member?.roles instanceof GuildMemberManager)) {
 		return interaction.editReply(
-			":x: Error timing this user out: could not fetch your roles.",
+			":x: Error timing this user out: could not fetch your roles."
 		);
 	}
 
@@ -65,7 +65,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	// check if the bot has permissions to timeout the target user
 	if (!member.manageable || !member.moderatable) {
 		return interaction.editReply(
-			":x: I do not have permission to time this user out.",
+			":x: I do not have permission to time this user out."
 		);
 	}
 	// check if this user is already timed out
@@ -77,7 +77,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	// check if the moderator has permission to timeout members
 	if (!interaction.memberPermissions?.has("ModerateMembers")) {
 		return interaction.editReply(
-			":x: You do not have permission to timeout members.",
+			":x: You do not have permission to timeout members."
 		);
 	}
 	// check role hierarchy
@@ -86,7 +86,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			?.position <= member.roles.highest?.position
 	) {
 		return interaction.editReply(
-			":x: You cannot timeout a user with an equal or higher role than you.",
+			":x: You cannot timeout a user with an equal or higher role than you."
 		);
 	}
 
@@ -96,7 +96,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	const minutes = interaction.options.getInteger("minutes") || 0;
 	if (days === 0 && hours === 0 && minutes === 0) {
 		return interaction.editReply(
-			":x: Please specify a duration for the timeout (days, hours, minutes).",
+			":x: Please specify a duration for the timeout (days, hours, minutes)."
 		);
 	}
 	const duration =
@@ -114,7 +114,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	const timeout = await member.timeout(duration, logStr).catch(() => null);
 	if (!timeout) {
 		return interaction.editReply(
-			":x: Failed to timeout the user. Please check my permissions and try again.",
+			":x: Failed to timeout the user. Please check my permissions and try again."
 		);
 	}
 
@@ -126,12 +126,12 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			.send(logStr)
 			.catch((e) =>
 				Logger.error(
-					`/timeout - Failed to send timeout log message: ${e}`,
-				),
+					`/timeout - Failed to send timeout log message: ${e}`
+				)
 			);
 	} else {
 		Logger.warn(
-			`Timeout log channel with ID ${timeoutLogsChannelID} not found or is not text-based.`,
+			`Timeout log channel with ID ${timeoutLogsChannelID} not found or is not text-based.`
 		);
 	}
 
@@ -144,7 +144,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 	return await interaction.editReply(
 		`:white_check_mark: ${member.user.username} has been timed out for ${durationStr} (until <t:${Math.round(
-			(timeout.communicationDisabledUntil?.getTime() ?? 67000) / 1000,
-		)}:f>).\nReason: \`${reason}\`${sent ? "" : `\n\n:warning: I was unable to send this DM to the user:\n${userMsg}`}`,
+			(timeout.communicationDisabledUntil?.getTime() ?? 67000) / 1000
+		)}:f>).\nReason: \`${reason}\`${sent ? "" : `\n\n:warning: I was unable to send this DM to the user:\n${userMsg}`}`
 	);
 };

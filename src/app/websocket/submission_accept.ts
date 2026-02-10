@@ -22,12 +22,14 @@ import { eq } from "drizzle-orm";
 
 export const notification_type = "SUBMISSION_ACCEPTED";
 
-export const handler = async (
-	client: Client<true>,
-	data: UnresolvedSubmission,
+export const handle = async (
+	client: Client,
+	db: any,
+	config: any,
+	data: UnresolvedSubmission
 ) => {
-	Logger.log("Received submission accepted notification:");
-	Logger.log(data);
+	Logger.info("Received submission accepted notification:");
+	Logger.info(data);
 
 	const isPlat = "completion_time" in data && data.completion_time !== null;
 
@@ -35,7 +37,7 @@ export const handler = async (
 		await Promise.all([
 			api.send<ExtendedLevel>(
 				`${isPlat ? "/arepl" : "/aredl"}/levels/${data.level_id}`,
-				"GET",
+				"GET"
 			),
 			api.send<User>(`/users/${data.submitted_by}`, "GET"),
 			api.send<User>(`/users/${data.reviewer_id}`, "GET"),
@@ -43,19 +45,19 @@ export const handler = async (
 
 	if (levelResponse.error) {
 		Logger.error(
-			`Error fetching level data: ${levelResponse.data.message}`,
+			`Error fetching level data: ${levelResponse.data.message}`
 		);
 		return;
 	}
 	if (submitterResponse.error) {
 		Logger.error(
-			`Error fetching user data: ${submitterResponse.data.message}`,
+			`Error fetching user data: ${submitterResponse.data.message}`
 		);
 		return;
 	}
 	if (reviewerResponse.error) {
 		Logger.error(
-			`Error fetching reviewer data: ${reviewerResponse.data.message}`,
+			`Error fetching reviewer data: ${reviewerResponse.data.message}`
 		);
 		return;
 	}
@@ -63,7 +65,7 @@ export const handler = async (
 	const archiveEmbed = new EmbedBuilder()
 		.setColor(0x8fce00)
 		.setTitle(
-			`:white_check_mark: [#${levelResponse.data.position}] ${levelResponse.data.name}`,
+			`:white_check_mark: [#${levelResponse.data.position}] ${levelResponse.data.name}`
 		)
 		.addFields([
 			{
@@ -131,10 +133,10 @@ export const handler = async (
 	const publicEmbed = new EmbedBuilder()
 		.setColor(0x8fce00)
 		.setTitle(
-			`:white_check_mark: [#${levelResponse.data.position}] ${levelResponse.data.name}`,
+			`:white_check_mark: [#${levelResponse.data.position}] ${levelResponse.data.name}`
 		)
 		.setDescription(
-			"Accepted\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800",
+			"Accepted\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800"
 		)
 		.addFields([
 			{
@@ -167,11 +169,11 @@ export const handler = async (
 		: guild;
 
 	const staffChannel = staffGuild.channels.cache.get(
-		isPlat ? platArchiveRecordsID : classicArchiveRecordsID,
+		isPlat ? platArchiveRecordsID : classicArchiveRecordsID
 	);
 
 	const publicChannel = guild.channels.cache.get(
-		isPlat ? platRecordsID : classicRecordsID,
+		isPlat ? platRecordsID : classicRecordsID
 	);
 
 	if (staffChannel && staffChannel.isSendable()) {
@@ -200,7 +202,7 @@ export const handler = async (
 			return;
 		}
 		const firstMessage = await ucChannel.messages.fetch(
-			ucThread.message_id,
+			ucThread.message_id
 		);
 		await firstMessage.reactions.removeAll();
 		await firstMessage.react("✅");
@@ -214,7 +216,7 @@ export const handler = async (
 		await thread.setName(
 			threadName.length > 100
 				? `${threadName.slice(0, 97)}...`
-				: threadName,
+				: threadName
 		);
 
 		await thread.send({

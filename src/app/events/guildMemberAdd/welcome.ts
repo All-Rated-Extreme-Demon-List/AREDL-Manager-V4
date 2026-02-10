@@ -40,7 +40,7 @@ const handler: EventHandler<"guildMemberAdd"> = async (member) => {
 	if (!enableWelcomeMessage) return;
 
 	const avatar = await Canvas.loadImage(
-		member.displayAvatarURL({ extension: "jpg" }),
+		member.displayAvatarURL({ extension: "jpg" })
 	);
 
 	const canvas = Canvas.createCanvas(700, 250);
@@ -56,7 +56,7 @@ const handler: EventHandler<"guildMemberAdd"> = async (member) => {
 	context.fillText(
 		"just joined the server",
 		canvas.width / 2.5,
-		canvas.height / 1.8,
+		canvas.height / 1.8
 	);
 
 	context.font = applyText(canvas, `${member.displayName}`);
@@ -64,7 +64,7 @@ const handler: EventHandler<"guildMemberAdd"> = async (member) => {
 	context.fillText(
 		`${member.displayName}`,
 		canvas.width / 2.5,
-		canvas.height / 2.5,
+		canvas.height / 2.5
 	);
 
 	context.font = "28px Open Sans";
@@ -72,7 +72,7 @@ const handler: EventHandler<"guildMemberAdd"> = async (member) => {
 	context.fillText(
 		`Member #${member.guild.memberCount}`,
 		canvas.width / 2.5,
-		canvas.height / 1.4,
+		canvas.height / 1.4
 	);
 
 	context.beginPath();

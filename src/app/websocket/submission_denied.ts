@@ -22,8 +22,10 @@ import { eq } from "drizzle-orm";
 export const notification_type = "SUBMISSION_DENIED";
 
 export const handle = async (
-	client: Client<true>,
-	data: UnresolvedSubmission,
+	client: Client,
+	db: any,
+	config: any,
+	data: UnresolvedSubmission
 ) => {
 	const isPlat = "completion_time" in data && data.completion_time !== null;
 
@@ -31,7 +33,7 @@ export const handle = async (
 		await Promise.all([
 			api.send<ExtendedLevel>(
 				`${isPlat ? "/arepl" : "/aredl"}/levels/${data.level_id}`,
-				"GET",
+				"GET"
 			),
 			api.send<User>(`/users/${data.submitted_by}`, "GET"),
 			api.send<User>(`/users/${data.reviewer_id}`, "GET"),
@@ -39,20 +41,20 @@ export const handle = async (
 
 	if (levelResponse.error) {
 		Logger.error(
-			`Error fetching level data: ${levelResponse.data.message}`,
+			`Error fetching level data: ${levelResponse.data.message}`
 		);
 		return;
 	}
 
 	if (submitterResponse.error) {
 		Logger.error(
-			`Error fetching user data: ${submitterResponse.data.message}`,
+			`Error fetching user data: ${submitterResponse.data.message}`
 		);
 		return;
 	}
 	if (reviewerResponse.error) {
 		Logger.error(
-			`Error fetching reviewer data: ${reviewerResponse.data.message}`,
+			`Error fetching reviewer data: ${reviewerResponse.data.message}`
 		);
 		return;
 	}
@@ -60,7 +62,7 @@ export const handle = async (
 	const archiveEmbed = new EmbedBuilder()
 		.setColor(0xcc0000)
 		.setTitle(
-			`:x: [#${levelResponse.data.position}] ${levelResponse.data.name}`,
+			`:x: [#${levelResponse.data.position}] ${levelResponse.data.name}`
 		)
 		.addFields([
 			{
@@ -128,10 +130,10 @@ export const handle = async (
 	const publicEmbed = new EmbedBuilder()
 		.setColor(0xcc0000)
 		.setTitle(
-			`:x: [#${levelResponse.data.position}] ${levelResponse.data.name}`,
+			`:x: [#${levelResponse.data.position}] ${levelResponse.data.name}`
 		)
 		.setDescription(
-			"Denied\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800",
+			"Denied\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800\u2800"
 		)
 		.addFields([
 			{
@@ -164,11 +166,11 @@ export const handle = async (
 		: guild;
 
 	const staffChannel = staffGuild.channels.cache.get(
-		isPlat ? platArchiveRecordsID : classicArchiveRecordsID,
+		isPlat ? platArchiveRecordsID : classicArchiveRecordsID
 	);
 
 	const publicChannel = guild.channels.cache.get(
-		isPlat ? platRecordsID : classicRecordsID,
+		isPlat ? platRecordsID : classicRecordsID
 	);
 
 	if (staffChannel && staffChannel.isSendable()) {
@@ -197,7 +199,7 @@ export const handle = async (
 			return;
 		}
 		const firstMessage = await ucChannel.messages.fetch(
-			ucThread.message_id,
+			ucThread.message_id
 		);
 		await firstMessage.reactions.removeAll();
 		await firstMessage.react("❌");
@@ -209,7 +211,7 @@ export const handle = async (
 		}
 		const baseName = `[Denied] #${levelResponse.data.position} ${levelResponse.data.name} - ${submitterResponse.data.global_name}`;
 		await thread.setName(
-			baseName.length > 100 ? `${baseName.slice(0, 97)}...` : baseName,
+			baseName.length > 100 ? `${baseName.slice(0, 97)}...` : baseName
 		);
 
 		await thread.send({

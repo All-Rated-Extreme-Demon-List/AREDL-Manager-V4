@@ -1,9 +1,6 @@
 import { ChatInputCommand, CommandData, CommandMetadata } from "commandkit";
 import { syncRoles } from "./syncRoles";
-import {
-	MessageFlags,
-	ApplicationCommandOptionType,
-} from "discord.js";
+import { MessageFlags, ApplicationCommandOptionType } from "discord.js";
 import { commandGuilds } from "@/util/commandGuilds";
 
 export const metadata = commandGuilds();
@@ -34,11 +31,11 @@ export const command: CommandData = {
 export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 	const guildMember = interaction.guild?.members.cache.get(
-		interaction.options.getUser("user", true).id,
+		interaction.options.getUser("user", true).id
 	);
 	if (!guildMember) {
 		return await interaction.editReply(
-			":x: Could not fetch the specified user's member data.",
+			":x: Could not fetch the specified user's member data."
 		);
 	}
 	return await syncRoles(interaction, guildMember);

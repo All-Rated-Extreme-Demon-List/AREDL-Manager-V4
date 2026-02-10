@@ -10,14 +10,14 @@ import {
 	Container,
 	TextDisplay,
 	Separator,
-	CommandMetadata
+	CommandMetadata,
 } from "commandkit";
 import { db } from "@/app";
 import { staffPointsTable } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { commandGuilds } from "@/util/commandGuilds";
 
-export const metadata = commandGuilds()
+export const metadata = commandGuilds();
 
 export const command: CommandData = {
 	name: "pointsadmin",
@@ -113,7 +113,10 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	const subcommand = interaction.options.getSubcommand();
 	await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 	if (subcommand === "all") {
-		const allStats = await db.select().from(staffPointsTable).orderBy(desc(staffPointsTable.points));
+		const allStats = await db
+			.select()
+			.from(staffPointsTable)
+			.orderBy(desc(staffPointsTable.points));
 
 		const container = (
 			<Container accentColor={0x75c8ff}>
@@ -125,7 +128,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 						: allStats
 								.map(
 									(stat) =>
-										`<@${stat.user}> - _\`${Math.round(stat.points * 100) / 100}\` points_`,
+										`<@${stat.user}> - _\`${Math.round(stat.points * 100) / 100}\` points_`
 								)
 								.join("\n")}
 				</TextDisplay>
@@ -138,69 +141,103 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		});
 	} else if (subcommand === "find") {
 		const user = interaction.options.getUser("user", true);
-		const points = await db.insert(staffPointsTable).values({
-			user: user.id,
-			points: defaultPoints,
-		}).onConflictDoNothing().returning().get();
+		const points = await db
+			.insert(staffPointsTable)
+			.values({
+				user: user.id,
+				points: defaultPoints,
+			})
+			.onConflictDoNothing()
+			.returning()
+			.get();
 		return await interaction.editReply(
-			`<@${user.id}> has ${Math.round(points.points * 100) / 100} points.`,
+			`<@${user.id}> has ${Math.round(points.points * 100) / 100} points.`
 		);
 	} else if (subcommand === "set") {
 		const user = interaction.options.getUser("user", true);
 		const points = interaction.options.getNumber("points", true);
-		await db.insert(staffPointsTable).values({
-			user: user.id,
-			points: points,
-		}).onConflictDoUpdate({
-			target: [staffPointsTable.user],
-			set: {
+		await db
+			.insert(staffPointsTable)
+			.values({
+				user: user.id,
 				points: points,
-			},
-		}).returning().get();
+			})
+			.onConflictDoUpdate({
+				target: [staffPointsTable.user],
+				set: {
+					points: points,
+				},
+			})
+			.returning()
+			.get();
 
 		return await interaction.editReply(
-			`:white_check_mark: Set points for <@${user.id}> to ${Math.round(points * 100) / 100}.`,
+			`:white_check_mark: Set points for <@${user.id}> to ${Math.round(points * 100) / 100}.`
 		);
 	} else if (subcommand === "transfer") {
 		const transferFrom = interaction.options.getUser("transfer-from", true);
 		const transferTo = interaction.options.getUser("transfer-to", true);
 		const overwrite = interaction.options.getInteger("overwrite") === 1;
-		const transferFromPoints = await db.select().from(staffPointsTable).where(eq(staffPointsTable.user, transferFrom.id)).limit(1).get();
+		const transferFromPoints = await db
+			.select()
+			.from(staffPointsTable)
+			.where(eq(staffPointsTable.user, transferFrom.id))
+			.limit(1)
+			.get();
 		if (!transferFromPoints) {
 			return await interaction.editReply(
-				`:x: <@${transferFrom.id}> does not have any points.`,
+				`:x: <@${transferFrom.id}> does not have any points.`
 			);
 		}
 
-		const transferToPoints = await db.insert(staffPointsTable).values({
-			user: transferTo.id,
-		}).onConflictDoNothing().returning().get();
+		const transferToPoints = await db
+			.insert(staffPointsTable)
+			.values({
+				user: transferTo.id,
+			})
+			.onConflictDoNothing()
+			.returning()
+			.get();
 
-		const newPoints = Math.min(overwrite ? transferFromPoints.points : transferToPoints.points + transferFromPoints.points, maxPoints);
+		const newPoints = Math.min(
+			overwrite
+				? transferFromPoints.points
+				: transferToPoints.points + transferFromPoints.points,
+			maxPoints
+		);
 
-		await db.insert(staffPointsTable).values({
-			user: transferTo.id,
-			points: newPoints,
-		}).onConflictDoUpdate({
-			target: [staffPointsTable.user],
-			set: {
+		await db
+			.insert(staffPointsTable)
+			.values({
+				user: transferTo.id,
 				points: newPoints,
-			},
-		}).returning().get();
+			})
+			.onConflictDoUpdate({
+				target: [staffPointsTable.user],
+				set: {
+					points: newPoints,
+				},
+			})
+			.returning()
+			.get();
 
 		return await interaction.editReply(
-			`:white_check_mark: Transferred points from <@${transferFrom.id}> to <@${transferTo.id}>. <@${transferTo.id}> now has ${Math.round(newPoints * 100) / 100} points.`,
+			`:white_check_mark: Transferred points from <@${transferFrom.id}> to <@${transferTo.id}>. <@${transferTo.id}> now has ${Math.round(newPoints * 100) / 100} points.`
 		);
 	} else if (subcommand === "clear") {
 		const user = interaction.options.getUser("user", true);
-		const points = await db.delete(staffPointsTable).where(eq(staffPointsTable.user, user.id)).returning().get();
+		const points = await db
+			.delete(staffPointsTable)
+			.where(eq(staffPointsTable.user, user.id))
+			.returning()
+			.get();
 		if (!points) {
 			return await interaction.editReply(
-				`:x: <@${user.id}> does not have any points.`,
+				`:x: <@${user.id}> does not have any points.`
 			);
 		}
 		return await interaction.editReply(
-			`:white_check_mark: Cleared points for <@${user.id}>.`,
+			`:white_check_mark: Cleared points for <@${user.id}>.`
 		);
 	}
 };

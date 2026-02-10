@@ -12,7 +12,7 @@ import { asc, eq, gte } from "drizzle-orm";
 import { guildId, staffGuildId } from "@/../config.json";
 import { commandGuilds } from "@/util/commandGuilds";
 
-export const metadata = commandGuilds()
+export const metadata = commandGuilds();
 
 export const command: CommandData = {
 	name: "stats",
@@ -43,7 +43,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 	if (sub === "servertraffic") {
 		const minDate = new Date(
-			new Date().getTime() - 30 * 24 * 60 * 60 * 1000,
+			new Date().getTime() - 30 * 24 * 60 * 60 * 1000
 		);
 
 		const statsData = await db
@@ -117,7 +117,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 					name: "Total leaves:",
 					value: `${totalLeft}`,
 					inline: true,
-				},
+				}
 			)
 			.setImage("attachment://membersgraph.png");
 
@@ -136,7 +136,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			.get();
 		if (existing) {
 			return interaction.editReply(
-				`A \`list_stats\` message already exists. Delete it from the DB if you want to create a new one.`,
+				`A \`list_stats\` message already exists. Delete it from the DB if you want to create a new one.`
 			);
 		}
 
@@ -160,7 +160,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		// infoMessageUpdate.execute();
 
 		return interaction.editReply(
-			`\`list_stats\` message sent and stored in the database.`,
+			`\`list_stats\` message sent and stored in the database.`
 		);
 	}
 
@@ -173,7 +173,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			.get();
 		if (existing) {
 			return interaction.editReply(
-				`A \`list_stats_public\` message already exists. Delete it from the DB if you want to create a new one.`,
+				`A \`list_stats_public\` message already exists. Delete it from the DB if you want to create a new one.`
 			);
 		}
 
@@ -197,7 +197,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		// infoMessageUpdate.execute();
 
 		return interaction.editReply(
-			`\`list_stats_public\` message sent and stored in the database.`,
+			`\`list_stats_public\` message sent and stored in the database.`
 		);
 	}
 };

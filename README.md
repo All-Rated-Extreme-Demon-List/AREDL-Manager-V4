@@ -12,5 +12,5 @@ npx commandkit dev
 
 ## Useful links
 
--   [Documentation](https://commandkit.dev)
--   [Discord](https://commandkit.dev/discord)
+- [Documentation](https://commandkit.dev)
+- [Discord](https://commandkit.dev/discord)

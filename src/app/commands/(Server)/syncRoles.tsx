@@ -30,48 +30,48 @@ export const metadata = commandGuilds();
 
 export const syncRoles = async (
 	interaction: ChatInputCommandInteraction,
-	member: GuildMember,
+	member: GuildMember
 ) => {
 	// do not stack if stack is explicitly set to "off", otherwise stack
 	const shouldStack = interaction.options.getNumber("stack") !== 0;
 
 	const profileReq = await api.send<Profile>(
-		`/aredl/profile/${member.user.id}`,
+		`/aredl/profile/${member.user.id}`
 	);
 	if (profileReq.error) {
 		if (profileReq.status === 404) {
 			Logger.error(
-				`Sync roles - User not found: ${profileReq.data.message}`,
+				`Sync roles - User not found: ${profileReq.data.message}`
 			);
 			return interaction.editReply(
-				`:x: Could not find this user's profile on the leaderboard!`,
+				`:x: Could not find this user's profile on the leaderboard!`
 			);
 		}
 		Logger.error(
-			`Sync roles - Error fetching profile: ${profileReq.data.message}`,
+			`Sync roles - Error fetching profile: ${profileReq.data.message}`
 		);
 		return interaction.editReply(
-			`Error fetching profile: ${profileReq.data.message}`,
+			`Error fetching profile: ${profileReq.data.message}`
 		);
 	}
 	const profile = profileReq.data;
 	const areplReq = await api.send<Profile>(
-		`/arepl/profile/${member.user.id}`,
+		`/arepl/profile/${member.user.id}`
 	);
 	if (areplReq.error) {
 		if (areplReq.status === 404) {
 			Logger.error(
-				`Sync roles - User not found: ${areplReq.data.message}`,
+				`Sync roles - User not found: ${areplReq.data.message}`
 			);
 			return interaction.editReply(
-				`:x: Could not find this user's platformer profile on the leaderboard!`,
+				`:x: Could not find this user's platformer profile on the leaderboard!`
 			);
 		}
 		Logger.error(
-			`Sync roles - Error fetching platformer profile: ${areplReq.data.message}`,
+			`Sync roles - Error fetching platformer profile: ${areplReq.data.message}`
 		);
 		return interaction.editReply(
-			`Error fetching platformer profile: ${areplReq.data.message}`,
+			`Error fetching platformer profile: ${areplReq.data.message}`
 		);
 	}
 	const arepl = areplReq.data;
@@ -97,7 +97,7 @@ export const syncRoles = async (
 	];
 	await member.roles.remove(
 		rolesToRemove,
-		"Sync Roles: Removing all automated roles",
+		"Sync Roles: Removing all automated roles"
 	);
 
 	const addRoles = (roleIds: string[]) => {
@@ -112,7 +112,7 @@ export const syncRoles = async (
 
 	const processRoleType = (
 		roleData: Record<string, string>,
-		requirement: (req: number) => boolean,
+		requirement: (req: number) => boolean
 	) => {
 		const rolesToAdd: string[] = [];
 		Object.entries(roleData).forEach(([k, v]) => {
@@ -132,13 +132,13 @@ export const syncRoles = async (
 	// Points roles
 	processRoleType(
 		pointsRoleIDs,
-		(req) => Math.round((profile?.rank?.total_points ?? 0) / 10) >= req,
+		(req) => Math.round((profile?.rank?.total_points ?? 0) / 10) >= req
 	);
 	// Pack roles
 	processRoleType(packRoleIDs, (req) => (profile?.packs?.length ?? 0) >= req);
 	// Top level roles
 	processRoleType(topLevelRoleIDs, (req) =>
-		profile?.records?.some((record) => record.level.position <= req),
+		profile?.records?.some((record) => record.level.position <= req)
 	);
 	// Opinion perms
 	if ((profile?.rank?.extremes ?? 0) >= 10) {
@@ -163,18 +163,18 @@ export const syncRoles = async (
 	try {
 		await member.roles.add(
 			addedRoles,
-			"Sync Roles: Automatically adding profile roles",
+			"Sync Roles: Automatically adding profile roles"
 		);
 	} catch (e) {
 		Logger.error("Sync roles - Error adding roles:");
 		Logger.error(e);
 		return interaction.editReply(
-			`:x: Error adding roles, please try again later`,
+			`:x: Error adding roles, please try again later`
 		);
 	}
 
 	const hardestRank = profile?.records?.reduce((prev, curr) =>
-		prev.level.position < curr.level.position ? prev : curr,
+		prev.level.position < curr.level.position ? prev : curr
 	)?.level.position;
 	const container = (
 		<Container accentColor={0x00ff00}>
@@ -220,7 +220,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 	await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 	if (!(interaction.member instanceof GuildMember))
 		return await interaction.editReply(
-			":x: Could not fetch your member data.",
+			":x: Could not fetch your member data."
 		);
 	return await syncRoles(interaction, interaction.member);
 };
