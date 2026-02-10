@@ -125,7 +125,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			<Container accentColor={0xff0000}>
 				<TextDisplay>## No Ping List</TextDisplay>
 				<TextDisplay>
-					There are {allUsers.length} players in the No Ping List.
+					{`There are ${allUsers.length} players in the No Ping List.`}
 				</TextDisplay>
 				<Separator spacing={SeparatorSpacingSize.Small} />
 				<TextDisplay>**__Opinion Banned__**</TextDisplay>

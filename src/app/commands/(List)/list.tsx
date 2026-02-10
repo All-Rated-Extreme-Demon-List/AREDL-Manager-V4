@@ -205,9 +205,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 				<Container accentColor={0xff0000}>
 					<TextDisplay>## :x: Error!</TextDisplay>
 					<TextDisplay>
-						**[{level1.name}](https://aredl.net/list/{ID1})** vs **[
-						{level2.name}](https://aredl.net/list/{ID2})**
-						{highExtremes ? " (High Extremes)" : ""}
+						{`**[${level1.name}](https://aredl.net/list/${ID1})** vs **[${level2.name}](https://aredl.net/list/${ID2})**${highExtremes ? " (High Extremes)" : ""}`}
 					</TextDisplay>
 					<TextDisplay>
 						{`Error fetching records for ${
@@ -242,9 +240,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 				<Container accentColor={0xff6f00}>
 					<TextDisplay>## Mutual victors</TextDisplay>
 					<TextDisplay>
-						**[{level1.name}](https://aredl.net/list/{ID1})** vs **[
-						{level2.name}](https://aredl.net/list/{ID2})**
-						{highExtremes ? " (High Extremes)" : ""}
+						{`**[${level1.name}](https://aredl.net/list/${ID1})** vs **[${level2.name}](https://aredl.net/list/${ID2})**${highExtremes ? " (High Extremes)" : ""}`}
 					</TextDisplay>
 					<TextDisplay>
 						*There are no mutual victors on these levels.*
@@ -373,16 +369,10 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 			<Container accentColor={0xff6f00}>
 				<TextDisplay>## Mutual victors</TextDisplay>
 				<TextDisplay>
-					**[{level1.name}](https://aredl.net/list/{ID1})** vs **[
-					{level2.name}](https://aredl.net/list/{ID2})**
-					{highExtremes ? " (High Extremes)" : ""}
+					{`**[${level1.name}](https://aredl.net/list/${ID1})** vs **[${level2.name}](https://aredl.net/list/${ID2})**${highExtremes ? " (High Extremes)" : ""}`}
 				</TextDisplay>
 				<TextDisplay>
-					*There{" "}
-					{filteredRecords.length === 1
-						? "is 1 mutual victor"
-						: `are ${filteredRecords.length} mutual victors`}{" "}
-					on these levels.*
+					{`*There ${filteredRecords.length === 1 ? "is 1 mutual victor" : `are ${filteredRecords.length} mutual victors`} on these levels.*`}
 				</TextDisplay>
 				<Separator spacing={SeparatorSpacingSize.Small} />
 				{!tooLong && <TextDisplay>{str}</TextDisplay>}
@@ -436,7 +426,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 				<Container accentColor={0xff0000}>
 					<TextDisplay>## :x: Error!</TextDisplay>
 					<TextDisplay>
-						Error fetching records for {level.name}!
+						{`Error fetching records for **[${level.name}](https://aredl.net/list/${ID})**!`}
 					</TextDisplay>
 				</Container>
 			);
@@ -451,10 +441,9 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 		if (records.length == 0) {
 			const container = (
 				<Container accentColor={0xff6f00}>
-					<TextDisplay>## {level.name}</TextDisplay>
+					<TextDisplay>{`## ${level.name}`}</TextDisplay>
 					<TextDisplay>
-						***[{level.name}](https://aredl.net/list/{ID})** has no
-						victors{highExtremes ? " who have 50+ extremes" : ""}.*
+						{`***[${level.name}](https://aredl.net/list/${ID})** has no victors${highExtremes ? " who have 50+ extremes" : ""}.*`}
 					</TextDisplay>
 				</Container>
 			);
@@ -574,7 +563,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
 		const container = (
 			<Container accentColor={0xff6f00}>
-				<TextDisplay>## {level.name}</TextDisplay>
+				<TextDisplay>{`## ${level.name}`}</TextDisplay>
 				<TextDisplay>
 					{`*There ${
 						records.length === 1
