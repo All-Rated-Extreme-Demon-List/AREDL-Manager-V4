@@ -7,10 +7,10 @@ import submissionDenied from "./submission_denied";
 import submissionUc from "./submission_uc";
 
 export const handlers = [
-	shiftCompleted,
-	shiftMissed,
-	shiftsCreated,
-	submissionAccept,
-	submissionDenied,
-	submissionUc,
+    shiftCompleted,
+    shiftMissed,
+    shiftsCreated,
+    submissionAccept,
+    submissionDenied,
+    submissionUc,
 ];

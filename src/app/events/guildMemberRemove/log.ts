@@ -5,22 +5,22 @@ import { db } from "@/app";
 import { eq } from "drizzle-orm";
 
 const handler: EventHandler<"guildMemberRemove"> = async (member) => {
-	if (member.guild.id != guildId) return;
-	Logger.info(`Member left: ${member.id}`);
+    if (member.guild.id != guildId) return;
+    Logger.info(`Member left: ${member.id}`);
 
-	const entry = await db
-		.insert(dailyStatsTable)
-		.values({
-			date: new Date(),
-		})
-		.onConflictDoNothing()
-		.returning()
-		.get();
+    const entry = await db
+        .insert(dailyStatsTable)
+        .values({
+            date: new Date(),
+        })
+        .onConflictDoNothing()
+        .returning()
+        .get();
 
-	await db
-		.update(dailyStatsTable)
-		.set({ nbMembersLeft: entry.nbMembersLeft + 1 })
-		.where(eq(dailyStatsTable.date, entry.date));
+    await db
+        .update(dailyStatsTable)
+        .set({ nbMembersLeft: entry.nbMembersLeft + 1 })
+        .where(eq(dailyStatsTable.date, entry.date));
 };
 
 export default handler;

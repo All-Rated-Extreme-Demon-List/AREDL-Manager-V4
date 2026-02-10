@@ -79,7 +79,7 @@ export const command: CommandData = {
     ],
 };
 export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
-	Logger.log(interaction.user.username);
+    Logger.log(interaction.user.username);
     const focused = interaction.options.getFocused();
     return await interaction.respond(
         await db

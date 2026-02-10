@@ -7,25 +7,25 @@ import { eq } from "drizzle-orm";
 import { commandGuilds } from "@/util/commandGuilds";
 
 export const command: CommandData = {
-	name: "points",
-	description: "View your total Pukeko Points",
+    name: "points",
+    description: "View your total Pukeko Points",
 };
 
 export const metadata = commandGuilds();
 
 export const chatInput: ChatInputCommand = async ({ interaction }) => {
-	await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-	const user = await db
-		.insert(staffPointsTable)
-		.values({
-			user: interaction.user.id,
-			points: defaultPoints,
-		})
-		.onConflictDoNothing()
-		.returning()
-		.get();
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    const user = await db
+        .insert(staffPointsTable)
+        .values({
+            user: interaction.user.id,
+            points: defaultPoints,
+        })
+        .onConflictDoNothing()
+        .returning()
+        .get();
 
-	return await interaction.editReply(
-		`You have **${Math.round(user.points * 100) / 100}** Pukeko Points.`
-	);
+    return await interaction.editReply(
+        `You have **${Math.round(user.points * 100) / 100}** Pukeko Points.`
+    );
 };
