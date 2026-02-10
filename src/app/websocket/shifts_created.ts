@@ -15,57 +15,58 @@ import { eq } from "drizzle-orm";
 import { shiftNotificationsTable, staffPointsTable } from "@/db/schema";
 import { sendShiftNotif } from "@/util/shiftNotifs";
 
-export const notification_type = "SHIFTS_CREATED";
+export default {
+	notification_type: "SHIFTS_CREATED",
+	handle: async (
+		client: Client,
+		db: any,
+		config: any,
+		data: WebsocketShift[]
+	) => {
+		Logger.info("Received shifts created notification:");
+		Logger.info(data);
 
-export const handle = async (
-	client: Client,
-	db: any,
-	config: any,
-	data: WebsocketShift[]
-) => {
-	Logger.info("Received shifts created notification:");
-	Logger.info(data);
+		if (!shiftsStartedID) return;
 
-	if (!shiftsStartedID) return;
-
-	const guild = await client.guilds.fetch(guildId);
-	const staffGuild = enableSeparateStaffServer
-		? await client.guilds.fetch(staffGuildId)
-		: guild;
-	const channel = staffGuild.channels.cache.get(shiftsStartedID);
-	if (!channel || !channel.isSendable()) {
-		Logger.error("Shifts started channel not found or not sendable.");
-	}
-	const currentTime = new Date().getTime();
-
-	for (const shift of data) {
-		try {
-			const dbShift = await db
-				.insert(shiftNotificationsTable)
-				.values({
-					user_id: shift.user_id,
-					start_at: shift.start_at,
-					end_at: shift.end_at,
-					target_count: shift.target_count,
-				})
-				.returning()
-				.get();
-
-			const startAt = new Date(shift.start_at).getTime();
-			setTimeout(
-				async () => {
-					await sendShiftNotif(channel as TextChannel, dbShift).catch(
-						(err: any) => {
-							Logger.error("Failed to send shift notification:");
-							Logger.error(err);
-						}
-					);
-				},
-				Math.max(startAt - currentTime, 0)
-			);
-		} catch (err) {
-			Logger.error("Failed to create shift notification in database:");
-			Logger.error(err);
+		const guild = await client.guilds.fetch(guildId);
+		const staffGuild = enableSeparateStaffServer
+			? await client.guilds.fetch(staffGuildId)
+			: guild;
+		const channel = staffGuild.channels.cache.get(shiftsStartedID);
+		if (!channel || !channel.isSendable()) {
+			Logger.error("Shifts started channel not found or not sendable.");
 		}
-	}
+		const currentTime = new Date().getTime();
+
+		for (const shift of data) {
+			try {
+				const dbShift = await db
+					.insert(shiftNotificationsTable)
+					.values({
+						user_id: shift.user_id,
+						start_at: shift.start_at,
+						end_at: shift.end_at,
+						target_count: shift.target_count,
+					})
+					.returning()
+					.get();
+
+				const startAt = new Date(shift.start_at).getTime();
+				setTimeout(
+					async () => {
+						await sendShiftNotif(channel as TextChannel, dbShift).catch(
+							(err: any) => {
+								Logger.error("Failed to send shift notification:");
+								Logger.error(err);
+							}
+						);
+					},
+					Math.max(startAt - currentTime, 0)
+				);
+			} catch (err) {
+				Logger.error("Failed to create shift notification in database:");
+				Logger.error(err);
+			}
+		}
+	},
 };

@@ -1,21 +1,18 @@
-# dependencies
 node_modules
 
-# build output
 build
 out
 dist
 
-# commandkit
 .commandkit
 dist
 compiled-commandkit.config.mjs
 
-# env
 **/*.env*
 !**/*.env.example*
 
-# logging
+data
+
 logs
 *.log
 npm-debug.log*
@@ -24,9 +21,11 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# other
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
 **/*.DS_Store
 .temp-example
-
-data/
-config.json
