@@ -8,12 +8,10 @@ import {
 } from "commandkit";
 import {
     ApplicationCommandOptionType,
-    HexColorString,
     LabelBuilder,
     MessageFlags,
 } from "discord.js";
 import {
-    resolveColor,
     EmbedBuilder,
     ButtonStyle,
     ModalBuilder,
@@ -135,7 +133,6 @@ export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
 };
 
 export const chatInput: ChatInputCommand = async ({ interaction }) => {
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     const subcommand = interaction.options.getSubcommand();
 
     if (subcommand === "create") {
@@ -157,7 +154,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                 )
                 .get()
         ) {
-            return await interaction.editReply({
+            return await interaction.reply({
                 content:
                     ":x: An embed with that name already exists in this server",
             });
@@ -166,17 +163,13 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         let colorResolved;
         if (color) {
             try {
-                const colorStr = ("#" +
-                    (color.startsWith("#")
-                        ? color.slice(1)
-                        : color)) as HexColorString;
-                colorResolved = resolveColor(colorStr);
+                colorResolved = parseInt(color.startsWith("#") ? color.slice(1) : color, 16)
                 if (!colorResolved)
-                    return await interaction.editReply({
+                    return await interaction.reply({
                         content: ":x: Invalid color",
                     });
             } catch (error) {
-                return await interaction.editReply({
+                return await interaction.reply({
                     content: `:x: Failed to resolve the color: ${error}`,
                 });
             }
@@ -186,7 +179,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             channel.id
         );
         if (!channelResolved || !channelResolved.isSendable())
-            return await interaction.editReply({
+            return await interaction.reply({
                 content: ":x: Invalid channel",
             });
 
@@ -224,7 +217,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                 );
 
             if (!title && !description && !image)
-                return await submittedModalInteraction.editReply({
+                return await submittedModalInteraction.reply({
                     content:
                         ":x: This embed is empty: you must provide at least a title, a description, or an image",
                 });
@@ -237,7 +230,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                 if (image) embed.setImage(image.url);
             } catch (error) {
                 Logger.error(`Failed to set the image: ${error}`);
-                return await submittedModalInteraction.editReply({
+                return await submittedModalInteraction.reply({
                     content: `:x: Failed to set the image: ${error}`,
                 });
             }
@@ -259,14 +252,14 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
             let response;
             try {
-                response = await submittedModalInteraction.editReply({
+                response = await submittedModalInteraction.reply({
                     content: "Embed preview:",
                     embeds: [embed],
                     components: [row],
                 });
             } catch (error) {
                 Logger.error(`Failed to create the embed: ${error}`);
-                return await submittedModalInteraction.editReply({
+                return await submittedModalInteraction.reply({
                     content: `:x: Failed to create the embed: ${error}`,
                 });
             }
@@ -313,7 +306,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                     });
                 }
             } catch {
-                await submittedModalInteraction.editReply({
+                await submittedModalInteraction.reply({
                     content:
                         ":x: Confirmation not received within 1 minute, cancelling",
                     components: [],
@@ -338,7 +331,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             )
             .get();
         if (!embedEntry) {
-            return await interaction.editReply({
+            return await interaction.reply({
                 content: `:x: No embed found with the name "${name}"`,
             });
         }
@@ -347,7 +340,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             embedEntry.channel
         );
         if (!channel || !channel.isTextBased()) {
-            return await interaction.editReply({
+            return await interaction.reply({
                 content:
                     ":x: Could not find the channel where the embed was sent.",
             });
@@ -357,14 +350,14 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             .fetch(embedEntry.discordid)
             .catch(() => null);
         if (!targetMessage) {
-            return await interaction.editReply({
+            return await interaction.reply({
                 content:
                     ":x: Could not find the original embed to edit. It might have been deleted.",
             });
         }
 
         if (!(targetMessage.embeds.length > 0) || !targetMessage.embeds[0]) {
-            return await interaction.editReply({
+            return await interaction.reply({
                 content: ":x: The target message does not contain an embed.",
             });
         }
@@ -372,16 +365,13 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         let colorResolved;
         if (color) {
             try {
-                const colorStr = (
-                    "#" + color.startsWith("#") ? color.slice(1) : color
-                ) as HexColorString;
-                colorResolved = resolveColor(colorStr);
+                colorResolved = parseInt(color.startsWith("#") ? color.slice(1) : color, 16)
                 if (!colorResolved)
-                    return await interaction.editReply({
+                    return await interaction.reply({
                         content: ":x: Invalid color",
                     });
             } catch (error) {
-                return await interaction.editReply({
+                return await interaction.reply({
                     content: `:x: Failed to resolve the color: ${error}`,
                 });
             }
@@ -452,14 +442,14 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
         let editResponse;
         try {
-            editResponse = await editSubmittedModal.editReply({
+            editResponse = await editSubmittedModal.reply({
                 content: "Embed preview (edited):",
                 embeds: [updatedEmbed],
                 components: [editRow],
             });
         } catch (error) {
             Logger.error(`Failed to create the edited embed preview: ${error}`);
-            return await editSubmittedModal.editReply({
+            return await editSubmittedModal.reply({
                 content: `:x: Failed to create the edited embed preview: ${error}`,
             });
         }
@@ -492,7 +482,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                 });
             }
         } catch {
-            await editSubmittedModal.editReply({
+            await editSubmittedModal.reply({
                 content:
                     ":x: Confirmation not received within 1 minute, cancelling",
                 components: [],
@@ -512,7 +502,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             )
             .get();
         if (!embedEntry) {
-            return await interaction.editReply({
+            return await interaction.reply({
                 content: `:x: No embed found with the name "${name}"`,
             });
         }
@@ -521,7 +511,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             embedEntry.channel
         );
         if (!channel || !channel.isTextBased()) {
-            return await interaction.editReply({
+            return await interaction.reply({
                 content:
                     ":x: Could not find the channel where the embed was sent.",
             });
@@ -542,7 +532,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                 );
         } catch (error) {
             Logger.error(`Failed to delete the embed: ${error}`);
-            return await interaction.editReply({
+            return await interaction.reply({
                 content: `:x: Failed to delete the embed from the bot: ${error}`,
             });
         }
@@ -551,13 +541,13 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                 await targetMessage.delete();
             } catch (error) {
                 Logger.error(`Failed to delete the embed: ${error}`);
-                return await interaction.editReply({
+                return await interaction.reply({
                     content: `:x: Removed the embed from the bot, but failed to delete the message: ${error}`,
                 });
             }
         }
 
-        await interaction.editReply({
+        await interaction.reply({
             content: `:white_check_mark: Embed "${name}" deleted successfully`,
         });
     }

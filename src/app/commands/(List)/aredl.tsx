@@ -95,6 +95,7 @@ export const command: CommandData = {
                     name: "country",
                     type: ApplicationCommandOptionType.String,
                     description: "Filter the leaderboard by country",
+                    autocomplete: true,
                 },
                 {
                     name: "sort",
@@ -343,7 +344,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             query
         );
         if (lbRes.error) {
-            Logger.info(`Failed to fetch leaderboard: ${lbRes.data.message}`);
+            Logger.error(`Failed to fetch leaderboard: ${lbRes.data.message}`);
             const container = (
                 <Container accentColor={0xff0000}>
                     <TextDisplay>
@@ -379,7 +380,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                     return (
                         <Section>
                             <TextDisplay>
-                                {`- #${entry.rank} ${
+                                {`- #${entry.rank} - ${
                                     entry.clan
                                         ? `[[${entry.clan.tag}]](https://aredl.net/clans/${entry.clan.id}) `
                                         : ""
@@ -423,6 +424,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         return await interaction.editReply({
             flags: MessageFlags.IsComponentsV2,
             components: [container],
+            allowedMentions: { parse: []}
         });
     }
 };

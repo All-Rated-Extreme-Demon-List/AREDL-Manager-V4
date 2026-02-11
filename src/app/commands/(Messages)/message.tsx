@@ -85,17 +85,13 @@ export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
         await db
             .select()
             .from(messagesTable)
-            .where(
-                and(
-                    eq(messagesTable.guild, interaction.guild?.id ?? "1"),
-                    eq(messagesTable.name, focused)
-                )
-            )
-            .limit(25)
-            .then((results) =>
-                results.map((msg) => ({
-                    name: msg.name,
-                    value: msg.name,
+            .where(eq(messagesTable.guild, interaction.guild?.id ?? "1"))
+            .then((messages) =>
+                messages.filter((message) =>
+                    message.name.toLowerCase().includes(focused.toLowerCase())
+                ).map((message) => ({
+                    name: message.name,
+                    value: message.name,
                 }))
             )
     );

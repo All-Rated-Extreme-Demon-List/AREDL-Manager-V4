@@ -4,7 +4,7 @@ import {
     ApplicationCommandOptionType,
 } from "discord.js";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
-import infoMessageUpdate from "@/app/tasks/infoMessageUpdate";
+import { updateInfoMessage } from "@/app/tasks/infoMessageUpdate";
 import { ChatInputCommand, CommandData } from "commandkit";
 import { dailyStatsTable, infoMessagesTable } from "@/db/schema";
 import { db } from "@/app";
@@ -156,7 +156,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             discordid: msg.id,
         });
 
-        infoMessageUpdate.execute();
+        updateInfoMessage(interaction.client);
 
         return interaction.editReply(
             `\`list_stats\` message sent and stored in the database.`
@@ -193,7 +193,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             discordid: msg.id,
         });
 
-        infoMessageUpdate.execute();
+        updateInfoMessage(interaction.client);
 
         return interaction.editReply(
             `\`list_stats_public\` message sent and stored in the database.`

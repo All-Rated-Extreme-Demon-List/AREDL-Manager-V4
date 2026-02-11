@@ -140,15 +140,27 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         });
     } else if (subcommand === "find") {
         const user = interaction.options.getUser("user", true);
-        const points = await db
-            .insert(staffPointsTable)
-            .values({
-                user: user.id,
-                points: defaultPoints,
-            })
-            .onConflictDoNothing()
-            .returning()
+        const existingPoints = await db
+            .select()
+            .from(staffPointsTable)
+            .where(eq(staffPointsTable.user, user.id))
+            .limit(1)
             .get();
+
+        const points = existingPoints
+            ? existingPoints
+            : await db
+                  .insert(staffPointsTable)
+                  .values({
+                      user: user.id,
+                      points: defaultPoints,
+                  })
+                  .onConflictDoNothing({
+                      target: [staffPointsTable.user],
+                  })
+                  .returning()
+                  .get();
+
         return await interaction.editReply(
             `<@${user.id}> has ${Math.round(points.points * 100) / 100} points.`
         );
@@ -189,14 +201,26 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             );
         }
 
-        const transferToPoints = await db
-            .insert(staffPointsTable)
-            .values({
-                user: transferTo.id,
-            })
-            .onConflictDoNothing()
-            .returning()
+        const existingTransferToPoints = await db
+            .select()
+            .from(staffPointsTable)
+            .where(eq(staffPointsTable.user, transferTo.id))
+            .limit(1)
             .get();
+
+        const transferToPoints = existingTransferToPoints
+            ? existingTransferToPoints
+            : await db
+                  .insert(staffPointsTable)
+                  .values({
+                      user: transferTo.id,
+                      points: defaultPoints,
+                  })
+                  .onConflictDoNothing({
+                      target: [staffPointsTable.user],
+                  })
+                  .returning()
+                  .get();
 
         const newPoints = Math.min(
             overwrite
@@ -219,6 +243,10 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
             })
             .returning()
             .get();
+
+        await db
+            .delete(staffPointsTable)
+            .where(eq(staffPointsTable.user, transferFrom.id))
 
         return await interaction.editReply(
             `:white_check_mark: Transferred points from <@${transferFrom.id}> to <@${transferTo.id}>. <@${transferTo.id}> now has ${Math.round(newPoints * 100) / 100} points.`
