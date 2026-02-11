@@ -1,4 +1,3 @@
-import { P } from "commandkit/dist/analytics-engine-WQhXmx3H";
 import { LevelRecord } from "./record";
 import { BaseLevel, Pack } from "./level";
 

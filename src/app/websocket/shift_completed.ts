@@ -5,25 +5,19 @@ import {
     enableSeparateStaffServer,
     pointsOnShiftComplete,
     maxPoints,
-    defaultPoints,
 } from "@/../config.json";
 import { api } from "@/api";
-import { Shift, WebsocketShift } from "@/types/shift";
+import { WebsocketShift } from "@/types/shift";
 import { User } from "@/types/user";
 import { Logger } from "commandkit";
 import { Client, EmbedBuilder } from "discord.js";
-import { db } from "@/app";
 import { eq } from "drizzle-orm";
 import { staffPointsTable } from "@/db/schema";
+import { db } from "@/app";
 
 export default {
     notification_type: "SHIFT_COMPLETED",
-    handle: async (
-        client: Client,
-        db: any,
-        config: any,
-        data: WebsocketShift
-    ) => {
+    handle: async (client: Client, data: WebsocketShift) => {
         Logger.info("Received shift completed notification:");
         Logger.info(data);
 

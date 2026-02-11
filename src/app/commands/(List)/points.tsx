@@ -1,9 +1,8 @@
-import { ChatInputCommand, CommandData, CommandMetadata } from "commandkit";
+import { ChatInputCommand, CommandData } from "commandkit";
 import { MessageFlags } from "discord.js";
-import { defaultPoints, staffGuildId } from "@/../config.json";
+import { defaultPoints } from "@/../config.json";
 import { staffPointsTable } from "@/db/schema";
 import { db } from "@/app";
-import { eq } from "drizzle-orm";
 import { commandGuilds } from "@/util/commandGuilds";
 
 export const command: CommandData = {

@@ -1,28 +1,19 @@
 import {
     guildId,
     staffGuildId,
-    maxPointsOnShiftMiss,
     enableSeparateStaffServer,
     shiftsStartedID,
 } from "@/../config.json";
-import { api } from "@/api";
-import { Shift, WebsocketShift } from "@/types/shift";
-import { User } from "@/types/user";
+import { WebsocketShift } from "@/types/shift";
 import { Logger } from "commandkit";
-import { Client, EmbedBuilder, TextChannel } from "discord.js";
+import { Client, TextChannel } from "discord.js";
 import { db } from "@/app";
-import { eq } from "drizzle-orm";
-import { shiftNotificationsTable, staffPointsTable } from "@/db/schema";
+import { shiftNotificationsTable } from "@/db/schema";
 import { sendShiftNotif } from "@/util/shiftNotifs";
 
 export default {
     notification_type: "SHIFTS_CREATED",
-    handle: async (
-        client: Client,
-        db: any,
-        config: any,
-        data: WebsocketShift[]
-    ) => {
+    handle: async (client: Client, data: WebsocketShift[]) => {
         Logger.info("Received shifts created notification:");
         Logger.info(data);
 
@@ -57,7 +48,7 @@ export default {
                         await sendShiftNotif(
                             channel as TextChannel,
                             dbShift
-                        ).catch((err: any) => {
+                        ).catch((err: unknown) => {
                             Logger.error("Failed to send shift notification:");
                             Logger.error(err);
                         });

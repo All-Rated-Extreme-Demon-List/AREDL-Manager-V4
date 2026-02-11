@@ -9,13 +9,11 @@ import {
     opinionPermsRoleID,
     extremeGrinderRoleID,
     guildId,
-    staffGuildId,
 } from "@/../config.json";
 import {
     AutocompleteCommand,
     ChatInputCommand,
     CommandData,
-    CommandMetadata,
     Container,
     File,
     Separator,

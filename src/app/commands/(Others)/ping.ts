@@ -1,10 +1,4 @@
-import type {
-    ChatInputCommand,
-    MessageCommand,
-    CommandData,
-    CommandMetadata,
-} from "commandkit";
-import { guildId, staffGuildId } from "@/../config.json";
+import type { ChatInputCommand, MessageCommand, CommandData } from "commandkit";
 import { commandGuilds } from "@/util/commandGuilds";
 
 export const metadata = commandGuilds();

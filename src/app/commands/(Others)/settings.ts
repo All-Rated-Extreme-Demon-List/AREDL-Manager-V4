@@ -1,8 +1,7 @@
 import { settingsTable } from "@/db/schema";
-import { ChatInputCommand, CommandData, CommandMetadata } from "commandkit";
+import { ChatInputCommand, CommandData } from "commandkit";
 import { ApplicationCommandOptionType } from "discord.js";
 import { db } from "@/app";
-import { guildId, staffGuildId } from "@/../config.json";
 import { commandGuilds } from "@/util/commandGuilds";
 
 export const metadata = commandGuilds();

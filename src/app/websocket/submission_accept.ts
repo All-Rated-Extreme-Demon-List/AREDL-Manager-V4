@@ -22,12 +22,7 @@ import { eq } from "drizzle-orm";
 
 export default {
     notification_type: "SUBMISSION_ACCEPTED",
-    handle: async (
-        client: Client,
-        db: any,
-        config: any,
-        data: UnresolvedSubmission
-    ) => {
+    handle: async (client: Client, data: UnresolvedSubmission) => {
         Logger.info("Received submission accepted notification:");
         Logger.info(data);
 

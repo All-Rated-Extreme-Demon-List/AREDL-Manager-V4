@@ -21,12 +21,7 @@ import { eq } from "drizzle-orm";
 
 export default {
     notification_type: "SUBMISSION_DENIED",
-    handle: async (
-        client: Client,
-        db: any,
-        config: any,
-        data: UnresolvedSubmission
-    ) => {
+    handle: async (client: Client, data: UnresolvedSubmission) => {
         const isPlat =
             "completion_time" in data && data.completion_time !== null;
 

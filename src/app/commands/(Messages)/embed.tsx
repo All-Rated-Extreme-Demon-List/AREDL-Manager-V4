@@ -5,7 +5,6 @@ import {
     Logger,
     ActionRow,
     Button,
-    CommandMetadata,
 } from "commandkit";
 import {
     ApplicationCommandOptionType,
@@ -16,7 +15,6 @@ import {
 import {
     resolveColor,
     EmbedBuilder,
-    ButtonBuilder,
     ButtonStyle,
     ModalBuilder,
     TextInputBuilder,
@@ -25,7 +23,6 @@ import {
 import { db } from "@/app";
 import { embedsTable } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import { guildId, staffGuildId } from "@/../config.json";
 import { commandGuilds } from "@/util/commandGuilds";
 
 export const metadata = commandGuilds();
@@ -245,16 +242,6 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                 });
             }
 
-            const confirm = new ButtonBuilder()
-                .setCustomId("confirm")
-                .setLabel("Send Embed")
-                .setStyle(ButtonStyle.Success);
-
-            const cancel = new ButtonBuilder()
-                .setCustomId("cancel")
-                .setLabel("Cancel")
-                .setStyle(ButtonStyle.Danger);
-
             const row = (
                 <ActionRow>
                     <Button
@@ -325,7 +312,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                         embeds: [],
                     });
                 }
-            } catch (e) {
+            } catch {
                 await submittedModalInteraction.editReply({
                     content:
                         ":x: Confirmation not received within 1 minute, cancelling",
@@ -504,7 +491,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                     components: [],
                 });
             }
-        } catch (error) {
+        } catch {
             await editSubmittedModal.editReply({
                 content:
                     ":x: Confirmation not received within 1 minute, cancelling",

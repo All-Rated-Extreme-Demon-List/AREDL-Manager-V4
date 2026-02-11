@@ -1,19 +1,13 @@
-import type { Client, Collection } from "discord.js";
+import type { Client } from "discord.js";
 
 export interface WebsocketHandler {
     notification_type: string;
-    handle: (
-        client: Client,
-        db: any,
-        config: any,
-        data: any
-    ) => Promise<void> | void;
+    handle: (client: Client, data: object) => Promise<void> | void;
 }
 
-export function isWebsocketHandler(obj: any): obj is WebsocketHandler {
+export function isWebsocketHandler(obj: object): obj is WebsocketHandler {
     return (
         obj &&
-        typeof obj === "object" &&
         typeof obj.notification_type === "string" &&
         typeof obj.handle === "function"
     );

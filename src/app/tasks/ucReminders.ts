@@ -8,14 +8,11 @@ import {
     guildId,
 } from "@/../config.json";
 import { api } from "@/api.js";
-import { EmbedBuilder } from "discord.js";
 import { Logger } from "commandkit";
 import { task } from "@commandkit/tasks";
-import { Shift } from "@/types/shift";
 import { PaginatedResponse } from "@/types/api";
 import { db } from "@/app";
-import { User } from "@/types/user";
-import { sentUcRemindersTable, settingsTable } from "@/db/schema";
+import { sentUcRemindersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { Submission } from "@/types/record";
 
@@ -77,9 +74,9 @@ export default task({
             (a, b) => b.updated_at.getTime() - a.updated_at.getTime()
         );
 
-        let alreadyReminded = await db.select().from(sentUcRemindersTable);
+        const alreadyReminded = await db.select().from(sentUcRemindersTable);
 
-        alreadyReminded = alreadyReminded.filter((reminded) => {
+        alreadyReminded.forEach((reminded) => {
             const submissionExists = submissions.find(
                 (submission) => submission.id === reminded.id
             );

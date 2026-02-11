@@ -1,4 +1,4 @@
-import { ChatInputCommand, CommandData, CommandMetadata } from "commandkit";
+import { ChatInputCommand, CommandData } from "commandkit";
 import { syncRoles } from "./syncRoles";
 import { MessageFlags, ApplicationCommandOptionType } from "discord.js";
 import { commandGuilds } from "@/util/commandGuilds";

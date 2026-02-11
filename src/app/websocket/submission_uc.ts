@@ -2,9 +2,7 @@ import {
     guildId,
     staffGuildId,
     platArchiveRecordsID,
-    platRecordsID,
     classicArchiveRecordsID,
-    classicRecordsID,
     ucRecordsID,
     enableSeparateStaffServer,
 } from "@/../config.json";
@@ -21,12 +19,7 @@ import { eq } from "drizzle-orm";
 
 export default {
     notification_type: "SUBMISSION_UNDER_CONSIDERATION",
-    handle: async (
-        client: Client,
-        db: any,
-        config: any,
-        data: UnresolvedSubmission
-    ) => {
+    handle: async (client: Client, data: UnresolvedSubmission) => {
         Logger.info("Received submission under consideration notification:");
         Logger.info(data);
 

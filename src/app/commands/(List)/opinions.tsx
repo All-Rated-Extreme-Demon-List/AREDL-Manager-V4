@@ -3,8 +3,8 @@ import {
     SeparatorSpacingSize,
     ApplicationCommandOptionType,
 } from "discord.js";
-import { Container, Separator, TextDisplay, CommandMetadata } from "commandkit";
-import { guildId, noPingListRoleID, staffGuildId } from "@/../config.json";
+import { Container, Separator, TextDisplay } from "commandkit";
+import { guildId, noPingListRoleID } from "@/../config.json";
 import { ChatInputCommand, CommandData } from "commandkit";
 import { db } from "@/app";
 import { noPingListTable } from "@/db/schema";

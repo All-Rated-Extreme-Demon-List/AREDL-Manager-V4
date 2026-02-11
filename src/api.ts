@@ -4,8 +4,8 @@ import { ApiResponse } from "./types/api";
 
 class ApiError extends Error {
     status: number;
-    data: unknown;
-    constructor(message: string, status: number, data: any) {
+    data: object;
+    constructor(message: string, status: number, data: object) {
         super(message);
         this.status = status;
         this.data = data;
@@ -16,13 +16,13 @@ const api = {
     send: async function <T = unknown>(
         path: string,
         method: string = "GET",
-        query?: any,
-        body?: any
+        query?: object,
+        body?: object
     ): Promise<ApiResponse<T>> {
         let cleanedQuery;
         if (query) {
             cleanedQuery = Object.entries(query)
-                .filter(([_, v]) => v != null)
+                .filter(([k, v]) => k !== null && v != null)
                 .map(([k, v]) => [k, String(v)]);
         }
         const url =

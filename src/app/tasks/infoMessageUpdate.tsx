@@ -9,7 +9,6 @@ import {
     AttachmentBuilder,
     ContainerBuilder,
     MessageFlags,
-    ComponentBuilder,
     DiscordAPIError,
 } from "discord.js";
 import { db } from "@/app";
@@ -68,6 +67,7 @@ export default task({
             backgroundColour: "white",
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const safeNumber = (v: any, d = 0) =>
             Number.isFinite(Number(v)) ? Number(v) : d;
 
@@ -81,7 +81,9 @@ export default task({
                 ) {
                     return safeNumber(payload.data[0].records, 0);
                 }
-            } catch (_) {}
+            } catch {
+                /* ignore */
+            }
             return 0;
         };
 
@@ -345,15 +347,28 @@ export default task({
                     throw new Error("Channel not found or not text-based");
                 const message = await channel.messages.fetch(entry.discordid);
                 return message;
-            } catch (err: any) {
-                const code = err?.code || err?.rawError?.code;
-                if (code === 10008 || code === 10003) {
-                    Logger.warn("Scheduled - Info message no longer exists.");
+            } catch (err: unknown) {
+                if (err instanceof DiscordAPIError) {
+                    const code =
+                        err?.code ||
+                        (err?.rawError && "code" in err.rawError
+                            ? err.rawError.code
+                            : undefined);
+                    if (code === 10008 || code === 10003) {
+                        Logger.warn(
+                            "Scheduled - Info message no longer exists."
+                        );
+                    } else {
+                        Logger.warn(
+                            `Scheduled - Could not fetch message to update. Error: ${err.message}`
+                        );
+                    }
                 } else {
                     Logger.warn(
-                        `Scheduled - Could not fetch message to update. Error: ${err?.message || err}`
+                        `Scheduled - Could not fetch message to update. Error: ${err}`
                     );
                 }
+
                 await db
                     .delete(infoMessagesTable)
                     .where(eq(infoMessagesTable.id, entry.id));

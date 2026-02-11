@@ -4,11 +4,10 @@ import {
     maxPointsOnShiftMiss,
     enableSeparateStaffServer,
     missedShiftsID,
-    maxPoints,
     defaultPoints,
 } from "@/../config.json";
 import { api } from "@/api";
-import { Shift, WebsocketShift } from "@/types/shift";
+import { WebsocketShift } from "@/types/shift";
 import { User } from "@/types/user";
 import { Logger } from "commandkit";
 import { Client, EmbedBuilder } from "discord.js";
@@ -22,12 +21,7 @@ interface ShiftMissedData {
 
 export default {
     notification_type: "SHIFTS_MISSED",
-    handle: async (
-        client: Client,
-        db: any,
-        config: any,
-        data: ShiftMissedData
-    ) => {
+    handle: async (client: Client, data: ShiftMissedData) => {
         Logger.info("Received shift missed notification:");
         Logger.info(data);
 

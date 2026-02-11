@@ -1,7 +1,6 @@
 import {
     AutocompleteCommand,
     CommandData,
-    CommandMetadata,
     ChatInputCommand,
     Logger,
     ActionRow,
@@ -26,7 +25,6 @@ import {
 } from "discord.js";
 import iso from "iso-3166-1";
 import { ExtendedLevel, Level } from "@/types/level.ts";
-import { staffGuildId, guildId } from "../../../../config.json";
 import { BaseUser } from "@/types/user.js";
 import { LeaderboardEntry } from "@/types/record.js";
 import { commandGuilds } from "@/util/commandGuilds.ts";
@@ -216,6 +214,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         const section = new SectionBuilder().addTextDisplayComponents(text2);
 
         const exp =
+            // eslint-disable-next-line no-useless-escape
             /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/|shorts\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
 
         if (level.verifications.length > 0 && level.verifications[0]) {
@@ -331,7 +330,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         const sort = interaction.options.getString("sort");
         const page = interaction.options.getInteger("page");
         const country = iso.whereNumeric(countryCodeFilter ?? "");
-        const query: Record<string, any> = {
+        const query: Record<string, number | string> = {
             per_page: usersPerPage,
         };
         if (nameFilter) query.name_filter = `%${nameFilter}%`;
@@ -380,7 +379,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
                     return (
                         <Section>
                             <TextDisplay>
-                                {`- \#${entry.rank} ${
+                                {`- #${entry.rank} ${
                                     entry.clan
                                         ? `[[${entry.clan.tag}]](https://aredl.net/clans/${entry.clan.id}) `
                                         : ""

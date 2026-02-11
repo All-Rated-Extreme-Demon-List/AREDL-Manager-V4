@@ -47,8 +47,7 @@ export interface LeaderboardEntryData {
     clan?: Clan;
 }
 
-export interface LeaderboardEntry
-    extends PaginatedResponse<LeaderboardEntryData> {
+export interface LeaderboardEntry extends PaginatedResponse<LeaderboardEntryData> {
     last_refreshed: string;
 }
 

@@ -1,9 +1,9 @@
-import { Collection, Client } from "discord.js";
+import { Client } from "discord.js";
 import WebSocket from "ws";
-import type { WebsocketHandler } from "../types/websocket.d";
 import { isWebsocketHandler } from "../types/websocket.d";
 import { Logger } from "commandkit";
 import { handlers } from "../app/websocket/index";
+import { websocketURL } from "@/../config.json";
 
 /**
  * Load all WebSocket handlers from the websocket index
@@ -36,16 +36,8 @@ export async function initWebsocket(client: Client): Promise<void> {
 /**
  * Connect to the API WebSocket and route incoming messages to handlers
  */
-export async function initAPIWebsocket(
-    client: Client,
-    db: any,
-    config: any
-): Promise<void> {
+export async function initAPIWebsocket(client: Client): Promise<void> {
     const apiToken = `Bearer ${process.env.API_TOKEN}`;
-    const wsUrl =
-        config.websocketURL ||
-        "wss://api.aredl.net/v2dev/api/notifications/websocket";
-
     if (!apiToken) {
         Logger.error(
             "[WebSocket] API_TOKEN not found in environment variables"
@@ -55,7 +47,7 @@ export async function initAPIWebsocket(
 
     function connectWebSocket(): void {
         try {
-            const ws = new WebSocket(wsUrl, {
+            const ws = new WebSocket(websocketURL, {
                 headers: {
                     Authorization: apiToken,
                 },
@@ -87,7 +79,7 @@ export async function initAPIWebsocket(
                         return;
                     }
 
-                    await handler.handle(client, db, config, message);
+                    await handler.handle(client, message);
                 } catch (error) {
                     Logger.error("[WebSocket] Error processing message:");
                     Logger.error(error);

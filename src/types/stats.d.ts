@@ -1,4 +1,4 @@
-import { BaseLevel, Level } from "./level";
+import { BaseLevel } from "./level";
 import { BaseUser } from "./user";
 
 export interface DailyStatistics {
