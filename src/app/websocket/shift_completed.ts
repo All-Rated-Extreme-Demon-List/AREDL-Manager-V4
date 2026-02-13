@@ -18,9 +18,6 @@ import { db } from "@/app";
 export default {
     notification_type: "SHIFT_COMPLETED",
     handle: async (client: Client, data: WebsocketShift) => {
-        Logger.info("Received shift completed notification:");
-        Logger.info(data);
-
         const reviewerResponse = await api.send<User>(
             `/users/${data.user_id}`,
             "GET"

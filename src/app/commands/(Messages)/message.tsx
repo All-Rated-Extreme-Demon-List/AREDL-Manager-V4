@@ -79,7 +79,6 @@ export const command: CommandData = {
     ],
 };
 export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
-    Logger.log(interaction.user.username);
     const focused = interaction.options.getFocused();
     return await interaction.respond(
         await db
@@ -87,12 +86,16 @@ export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
             .from(messagesTable)
             .where(eq(messagesTable.guild, interaction.guild?.id ?? "1"))
             .then((messages) =>
-                messages.filter((message) =>
-                    message.name.toLowerCase().includes(focused.toLowerCase())
-                ).map((message) => ({
-                    name: message.name,
-                    value: message.name,
-                }))
+                messages
+                    .filter((message) =>
+                        message.name
+                            .toLowerCase()
+                            .includes(focused.toLowerCase())
+                    )
+                    .map((message) => ({
+                        name: message.name,
+                        value: message.name,
+                    }))
             )
     );
 };

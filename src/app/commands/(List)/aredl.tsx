@@ -424,7 +424,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         return await interaction.editReply({
             flags: MessageFlags.IsComponentsV2,
             components: [container],
-            allowedMentions: { parse: []}
+            allowedMentions: { parse: [] },
         });
     }
 };

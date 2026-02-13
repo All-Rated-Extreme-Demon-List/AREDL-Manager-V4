@@ -20,9 +20,6 @@ import { eq } from "drizzle-orm";
 export default {
     notification_type: "SUBMISSION_UNDER_CONSIDERATION",
     handle: async (client: Client, data: UnresolvedSubmission) => {
-        Logger.info("Received submission under consideration notification:");
-        Logger.info(data);
-
         const isPlat =
             "completion_time" in data && data.completion_time !== null;
 

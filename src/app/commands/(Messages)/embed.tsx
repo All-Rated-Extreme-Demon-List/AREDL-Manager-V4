@@ -163,7 +163,10 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         let colorResolved;
         if (color) {
             try {
-                colorResolved = parseInt(color.startsWith("#") ? color.slice(1) : color, 16)
+                colorResolved = parseInt(
+                    color.startsWith("#") ? color.slice(1) : color,
+                    16
+                );
                 if (!colorResolved)
                     return await interaction.reply({
                         content: ":x: Invalid color",
@@ -365,7 +368,10 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         let colorResolved;
         if (color) {
             try {
-                colorResolved = parseInt(color.startsWith("#") ? color.slice(1) : color, 16)
+                colorResolved = parseInt(
+                    color.startsWith("#") ? color.slice(1) : color,
+                    16
+                );
                 if (!colorResolved)
                     return await interaction.reply({
                         content: ":x: Invalid color",

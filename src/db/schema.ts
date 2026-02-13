@@ -34,17 +34,9 @@ export const sentUcRemindersTable = sqliteTable("sentUcReminders", {
     id: text().primaryKey(),
 });
 
-export const shiftNotificationsTable = sqliteTable("shiftReminders", {
-    id: int().primaryKey({ autoIncrement: true }),
-    user_id: text().notNull(),
-    start_at: int({ mode: "timestamp" }).notNull(),
-    end_at: int({ mode: "timestamp" }).notNull(),
-    target_count: int().notNull(),
-});
-
 export const infoMessagesTable = sqliteTable("info_messages", {
     id: int().primaryKey({ autoIncrement: true }),
-    name: text().primaryKey(),
+    name: text().notNull().unique(),
     guild: text().notNull(),
     channel: text().notNull(),
     discordid: text().notNull(),

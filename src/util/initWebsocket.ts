@@ -10,26 +10,26 @@ import { websocketURL } from "@/../config.json";
  * and store them in client.websockets Collection
  */
 export async function initWebsocket(client: Client): Promise<void> {
-    Logger.info(`[WebSocket] Loading ${handlers.length} handler(s)...`);
+    Logger.info(`Loading ${handlers.length} WebSocket handler(s)...`);
 
     for (const handler of handlers) {
         try {
             if (isWebsocketHandler(handler)) {
                 client.websockets.set(handler.notification_type, handler);
                 Logger.info(
-                    `[WebSocket] Loaded handler: ${handler.notification_type}`
+                    `Loaded WebSocket handler: ${handler.notification_type}`
                 );
             } else {
-                Logger.warn(`[WebSocket] Invalid handler format`);
+                Logger.warn(`Invalid WebSocket handler format`);
             }
         } catch (error) {
-            Logger.error(`[WebSocket] Error loading handler:`);
+            Logger.error(`Error loading WebSocket handler:`);
             Logger.error(error);
         }
     }
 
     Logger.info(
-        `[WebSocket] Successfully loaded ${client.websockets.size} handler(s)`
+        `Successfully loaded ${client.websockets.size} WebSocket handler(s)`
     );
 }
 
@@ -54,17 +54,19 @@ export async function initAPIWebsocket(client: Client): Promise<void> {
             });
 
             ws.on("open", () => {
-                Logger.info("[WebSocket] Connected to API WebSocket");
+                Logger.info("Connected to API WebSocket");
             });
 
             ws.on("message", async (data: WebSocket.Data) => {
                 try {
                     const message = JSON.parse(data.toString());
                     const notificationType = message.notification_type;
+                    Logger.info(`Received WebSocket message: ${notificationType}`);
+                    console.log(message.data);
 
                     if (!notificationType) {
                         Logger.warn(
-                            "[WebSocket] Message missing notification_type:"
+                            "Message missing WebSocket notification_type:"
                         );
                         Logger.warn(message);
                         return;
@@ -74,14 +76,14 @@ export async function initAPIWebsocket(client: Client): Promise<void> {
 
                     if (!handler) {
                         Logger.warn(
-                            `[WebSocket] No handler found for notification_type: ${notificationType}`
+                            `No WebSocket handler found for notification_type: ${notificationType}`
                         );
                         return;
                     }
 
-                    await handler.handle(client, message);
+                    await handler.handle(client, message.data);
                 } catch (error) {
-                    Logger.error("[WebSocket] Error processing message:");
+                    Logger.error("Error processing WebSocket message:");
                     Logger.error(error);
                 }
             });
@@ -93,7 +95,7 @@ export async function initAPIWebsocket(client: Client): Promise<void> {
 
             ws.on("close", () => {
                 Logger.info(
-                    "[WebSocket] Disconnected from API WebSocket. Reconnecting in 5 seconds..."
+                    "Disconnected from API WebSocket. Reconnecting in 5 seconds..."
                 );
                 setTimeout(connectWebSocket, 5000);
             });

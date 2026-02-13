@@ -1,12 +1,11 @@
 import { guildId } from "@/../config.json";
-import { EventHandler, Logger } from "commandkit";
+import { EventHandler } from "commandkit";
 import { dailyStatsTable } from "@/db/schema";
 import { db } from "@/app";
 import { eq } from "drizzle-orm";
 
 const handler: EventHandler<"guildMemberRemove"> = async (member) => {
     if (member.guild.id != guildId) return;
-    Logger.info(`Member left: ${member.id}`);
 
     const entry = await db
         .insert(dailyStatsTable)

@@ -22,9 +22,6 @@ interface ShiftMissedData {
 export default {
     notification_type: "SHIFTS_MISSED",
     handle: async (client: Client, data: ShiftMissedData) => {
-        Logger.info("Received shift missed notification:");
-        Logger.info(data);
-
         const guild = await client.guilds.fetch(guildId);
         const staffGuild = enableSeparateStaffServer
             ? await client.guilds.fetch(staffGuildId)

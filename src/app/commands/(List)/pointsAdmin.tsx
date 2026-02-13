@@ -246,7 +246,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
 
         await db
             .delete(staffPointsTable)
-            .where(eq(staffPointsTable.user, transferFrom.id))
+            .where(eq(staffPointsTable.user, transferFrom.id));
 
         return await interaction.editReply(
             `:white_check_mark: Transferred points from <@${transferFrom.id}> to <@${transferTo.id}>. <@${transferTo.id}> now has ${Math.round(newPoints * 100) / 100} points.`

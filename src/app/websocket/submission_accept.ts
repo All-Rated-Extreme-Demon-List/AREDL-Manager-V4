@@ -23,9 +23,6 @@ import { eq } from "drizzle-orm";
 export default {
     notification_type: "SUBMISSION_ACCEPTED",
     handle: async (client: Client, data: UnresolvedSubmission) => {
-        Logger.info("Received submission accepted notification:");
-        Logger.info(data);
-
         const isPlat =
             "completion_time" in data && data.completion_time !== null;
 

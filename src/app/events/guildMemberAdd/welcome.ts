@@ -1,6 +1,4 @@
 import { EventHandler, Logger } from "commandkit";
-import { db } from "@/app";
-import { dailyStatsTable } from "@/db/schema";
 import {
     guildId,
     enableWelcomeMessage,
@@ -8,7 +6,6 @@ import {
 } from "@/../config.json";
 import Canvas from "@napi-rs/canvas";
 import { AttachmentBuilder } from "discord.js";
-import { eq } from "drizzle-orm";
 
 const applyText = (canvas: Canvas.Canvas, text: string): string => {
     const context = canvas.getContext("2d");
@@ -22,21 +19,6 @@ const applyText = (canvas: Canvas.Canvas, text: string): string => {
 
 const handler: EventHandler<"guildMemberAdd"> = async (member) => {
     if (member.guild.id != guildId) return;
-
-    const stat = await db
-        .insert(dailyStatsTable)
-        .values({
-            date: new Date(),
-        })
-        .onConflictDoNothing()
-        .returning()
-        .get();
-
-    await db
-        .update(dailyStatsTable)
-        .set({ nbMembersJoined: stat.nbMembersJoined + 1 })
-        .where(eq(dailyStatsTable.date, stat.date));
-
     if (!enableWelcomeMessage) return;
 
     const avatar = await Canvas.loadImage(

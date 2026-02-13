@@ -65,9 +65,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
     const safeNumber = (v: any, d = 0) =>
         Number.isFinite(Number(v)) ? Number(v) : d;
 
-    const safeGetTotalRecords = (
-        payload: ApiResponse<LevelStatistics[]>
-    ) => {
+    const safeGetTotalRecords = (payload: ApiResponse<LevelStatistics[]>) => {
         try {
             if (
                 Array.isArray(payload?.data) &&
@@ -108,8 +106,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                 totalAccepted,
                 totalDenied,
                 totalUnderConsideration: totalUC,
-                avgSubmittedPerDay:
-                    Math.round((totalSubmitted / 30) * 10) / 10,
+                avgSubmittedPerDay: Math.round((totalSubmitted / 30) * 10) / 10,
                 avgCheckedPerDay: Math.round((totalChecked / 30) * 10) / 10,
             } as StaffTotals,
         };
@@ -131,10 +128,8 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
             totals: {
                 totalSubmitted,
                 totalReviewed,
-                avgSubmittedPerDay:
-                    Math.round((totalSubmitted / 30) * 10) / 10,
-                avgReviewedPerDay:
-                    Math.round((totalReviewed / 30) * 10) / 10,
+                avgSubmittedPerDay: Math.round((totalSubmitted / 30) * 10) / 10,
+                avgReviewedPerDay: Math.round((totalReviewed / 30) * 10) / 10,
             } as Totals,
         };
     };
@@ -242,9 +237,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
             : "N/A";
 
         const blocks = [
-            new TextDisplayBuilder().setContent(
-                `## ${name} List Statistics`
-            ),
+            new TextDisplayBuilder().setContent(`## ${name} List Statistics`),
             new TextDisplayBuilder().setContent(
                 "**Total records count:** " +
                     totalRecords +
@@ -272,9 +265,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                 .setURL(`attachment://${chartName}`)
         );
 
-        const container = new ContainerBuilder().setAccentColor(
-            accentColor
-        );
+        const container = new ContainerBuilder().setAccentColor(accentColor);
         for (const b of blocks) {
             container
                 .addTextDisplayComponents([b])
@@ -293,9 +284,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
         chartName: string
     ) => {
         const blocks = [
-            new TextDisplayBuilder().setContent(
-                `## ${name} List Statistics`
-            ),
+            new TextDisplayBuilder().setContent(`## ${name} List Statistics`),
             new TextDisplayBuilder().setContent(
                 "**Total records count:** " +
                     totalRecords +
@@ -320,9 +309,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                 .setURL(`attachment://${chartName}`)
         );
 
-        const container = new ContainerBuilder().setAccentColor(
-            accentColor
-        );
+        const container = new ContainerBuilder().setAccentColor(accentColor);
         for (const b of blocks) {
             container
                 .addTextDisplayComponents([b])
@@ -349,9 +336,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                         ? err.rawError.code
                         : undefined);
                 if (code === 10008 || code === 10003) {
-                    Logger.warn(
-                        "Scheduled - Info message no longer exists."
-                    );
+                    Logger.warn("Scheduled - Info message no longer exists.");
                 } else {
                     Logger.warn(
                         `Scheduled - Could not fetch message to update. Error: ${err.message}`
@@ -449,23 +434,17 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
     ]);
 
     const aredl_daily =
-        !daily_stats_aredl.error &&
-        Array.isArray(daily_stats_aredl?.data?.data)
+        !daily_stats_aredl.error && Array.isArray(daily_stats_aredl?.data?.data)
             ? daily_stats_aredl.data.data
             : [];
     const arepl_daily =
-        !daily_stats_arepl.error &&
-        Array.isArray(daily_stats_arepl?.data?.data)
+        !daily_stats_arepl.error && Array.isArray(daily_stats_arepl?.data?.data)
             ? daily_stats_arepl.data.data
             : [];
     const aredl_total_records = safeGetTotalRecords(total_records_aredl);
     const arepl_total_records = safeGetTotalRecords(total_records_arepl);
-    const aredl_queue = queue_aredl.error
-        ? null
-        : (queue_aredl?.data ?? {});
-    const arepl_queue = queue_arepl.error
-        ? null
-        : (queue_arepl?.data ?? {});
+    const aredl_queue = queue_aredl.error ? null : (queue_aredl?.data ?? {});
+    const arepl_queue = queue_arepl.error ? null : (queue_arepl?.data ?? {});
 
     if (!aredl_daily.length && !arepl_daily.length) {
         Logger.warn(
@@ -504,9 +483,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                 aredlStaff.series
             );
             const fileName = "aredl-stats.png";
-            staffFiles.push(
-                new AttachmentBuilder(chart, { name: fileName })
-            );
+            staffFiles.push(new AttachmentBuilder(chart, { name: fileName }));
             mainAredlContainer = buildStaffContainer(
                 0xff6f00,
                 "Classic",
@@ -524,9 +501,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                 areplStaff.series
             );
             const fileName = "arepl-stats.png";
-            staffFiles.push(
-                new AttachmentBuilder(chart, { name: fileName })
-            );
+            staffFiles.push(new AttachmentBuilder(chart, { name: fileName }));
             mainAreplContainer = buildStaffContainer(
                 223,
                 "Platformer",
@@ -563,9 +538,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                 aredlPublic.series
             );
             const fileName = "aredl-stats-public.png";
-            publicFiles.push(
-                new AttachmentBuilder(chart, { name: fileName })
-            );
+            publicFiles.push(new AttachmentBuilder(chart, { name: fileName }));
             mainAredlContainerPub = buildPublicContainer(
                 0xff6f00,
                 "Classic",
@@ -583,9 +556,7 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                 areplPublic.series
             );
             const fileName = "arepl-stats-public.png";
-            publicFiles.push(
-                new AttachmentBuilder(chart, { name: fileName })
-            );
+            publicFiles.push(new AttachmentBuilder(chart, { name: fileName }));
             mainAreplContainerPub = buildPublicContainer(
                 223,
                 "Platformer",
@@ -595,27 +566,22 @@ export const updateInfoMessage = async (client: Client<boolean>) => {
                 fileName
             );
         }
-        if (mainAredlContainerPub)
-            publicComponents.push(mainAredlContainerPub);
-        if (mainAreplContainerPub)
-            publicComponents.push(mainAreplContainerPub);
+        if (mainAredlContainerPub) publicComponents.push(mainAredlContainerPub);
+        if (mainAreplContainerPub) publicComponents.push(mainAreplContainerPub);
     }
 
     // update messages
 
     await updateIfExists("list_stats", staffComponents, staffFiles);
-    await updateIfExists(
-        "list_stats_public",
-        publicComponents,
-        publicFiles
-    );
+    await updateIfExists("list_stats_public", publicComponents, publicFiles);
 
     Logger.info("Scheduled - Completed statistics updates.");
-}
+};
 
 export default task({
     name: "infoMessageUpdate",
     schedule: infoMessageUpdateSchedule,
+    immediate: true,
     async prepare() {
         return true;
     },

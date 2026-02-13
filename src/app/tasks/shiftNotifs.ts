@@ -1,17 +1,23 @@
 import { EmbedBuilder, TextChannel } from "discord.js";
-import { shiftsStartedID } from "@/../config.json";
+import {
+    shiftsStartedID,
+    guildId,
+    staffGuildId,
+    enableSeparateStaffServer,
+} from "@/../config.json";
 import { Logger } from "commandkit";
 import { User } from "@/types/user";
 import { api } from "@/api";
 import { db } from "@/app";
-import { shiftNotificationsTable, settingsTable } from "@/db/schema";
+import { settingsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { task } from "@commandkit/tasks";
+import { WebsocketShift } from "@/types/shift";
 
 export const sendShiftNotif = async (
     channel: TextChannel,
-    shift: typeof shiftNotificationsTable.$inferSelect
+    shift: WebsocketShift
 ) => {
-    if (!shiftsStartedID) return 0;
     try {
         const reviewerResponse = await api.send<User>(
             `/users/${shift.user_id}`,
@@ -21,9 +27,6 @@ export const sendShiftNotif = async (
             Logger.error(
                 `Shift Notification - Error fetching reviewer ${shift.user_id}: ${reviewerResponse.data.message}`
             );
-            await db
-                .delete(shiftNotificationsTable)
-                .where(eq(shiftNotificationsTable.id, shift.id));
             return 1;
         }
         let pingStr;
@@ -56,11 +59,8 @@ export const sendShiftNotif = async (
             .setTimestamp();
 
         await channel.send({ content: pingStr, embeds: [archiveEmbed] });
-        await db
-            .delete(shiftNotificationsTable)
-            .where(eq(shiftNotificationsTable.id, shift.id));
         Logger.info(
-            `Successfully sent and deleted shift notification (ID: ${shift.id})`
+            `Successfully sent shift notification for ${shift.user_id}`
         );
         return 0;
     } catch (e) {
@@ -68,19 +68,32 @@ export const sendShiftNotif = async (
             `Shift Notification - Error sending shift notification: ${e}`
         );
         Logger.error(shift);
-        try {
-            await db
-                .delete(shiftNotificationsTable)
-                .where(eq(shiftNotificationsTable.id, shift.id));
-            Logger.info(
-                `Deleted shift notification after error (ID: ${shift.id})`
-            );
-        } catch (deleteErr) {
-            Logger.error(
-                `Failed to delete shift notification (ID: ${shift.id}) after error:`
-            );
-            Logger.error(deleteErr);
-        }
         return 1;
     }
 };
+
+export default task({
+    name: "send-shift-notif",
+    async prepare() {
+        return !!shiftsStartedID;
+    },
+    async execute({ data: shift, client }) {
+        
+        const guild = await client.guilds.fetch(guildId);
+        const staffGuild = enableSeparateStaffServer
+            ? await client.guilds.fetch(staffGuildId)
+            : guild;
+        const channel = staffGuild.channels.cache.get(shiftsStartedID);
+        if (
+            !channel ||
+            !channel.isSendable() ||
+            !(channel instanceof TextChannel)
+        ) {
+            Logger.error("Shifts started channel not found or not sendable.");
+            return;
+        }
+        await sendShiftNotif(channel, shift as WebsocketShift).catch((e) => {
+            Logger.error(e);
+        });
+    },
+});

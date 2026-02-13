@@ -1,6 +1,5 @@
 import {
     ApplicationCommandOptionType,
-    GuildMemberManager,
     GuildMemberRoleManager,
 } from "discord.js";
 import { timeoutLogsChannelID } from "@/../config.json";
@@ -22,20 +21,20 @@ export const command: CommandData = {
         {
             name: "days",
             description: "Amount of days to timeout this user for",
-            type: ApplicationCommandOptionType.Number,
+            type: ApplicationCommandOptionType.Integer,
             min_value: 0,
         },
         {
             name: "hours",
             description: "Amount of hours to timeout this user for",
-            type: ApplicationCommandOptionType.Number,
+            type: ApplicationCommandOptionType.Integer,
             min_value: 0,
             max_value: 23,
         },
         {
             name: "minutes",
             description: "Amount of minutes to timeout this user for",
-            type: ApplicationCommandOptionType.Number,
+            type: ApplicationCommandOptionType.Integer,
             min_value: 0,
             max_value: 59,
         },
@@ -55,7 +54,7 @@ export const chatInput: ChatInputCommand = async ({ interaction }) => {
         return interaction.editReply(":x: User not found in this server.");
     }
 
-    if (!(interaction.member?.roles instanceof GuildMemberManager)) {
+    if (!(interaction.member?.roles instanceof GuildMemberRoleManager)) {
         return interaction.editReply(
             ":x: Error timing this user out: could not fetch your roles."
         );
