@@ -60,7 +60,8 @@ const getShifts = async (cutoff: Date) => {
 
 export default task({
     name: "weeklyPointsGain",
-    schedule: "0 0 * * 0", // weekly, on sunday at midnight
+    schedule:
+        enableStaffPoints && enableWeeklyStaffPoints ? "0 0 * * 0" : undefined, // weekly, on sunday at midnight
     async prepare() {
         return enableStaffPoints && enableWeeklyStaffPoints;
     },

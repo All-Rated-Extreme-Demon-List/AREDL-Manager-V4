@@ -72,13 +72,13 @@ export const sendShiftNotif = async (
     }
 };
 
+// Register as a task so that notifications can wait until their start time before sending.
 export default task({
     name: "send-shift-notif",
     async prepare() {
         return !!shiftsStartedID;
     },
     async execute({ data: shift, client }) {
-        
         const guild = await client.guilds.fetch(guildId);
         const staffGuild = enableSeparateStaffServer
             ? await client.guilds.fetch(staffGuildId)

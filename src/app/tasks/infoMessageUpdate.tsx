@@ -582,9 +582,6 @@ export default task({
     name: "infoMessageUpdate",
     schedule: infoMessageUpdateSchedule,
     immediate: true,
-    async prepare() {
-        return true;
-    },
     async execute({ client }) {
         await updateInfoMessage(client);
     },

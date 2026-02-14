@@ -18,7 +18,7 @@ import { Submission } from "@/types/record";
 
 export default task({
     name: "sendUcReminders",
-    schedule: ucReminderSchedule,
+    schedule: ucRemindersEnabled ? ucReminderSchedule : undefined,
     async prepare() {
         return ucRemindersEnabled;
     },

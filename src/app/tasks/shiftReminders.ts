@@ -16,10 +16,7 @@ import { eq } from "drizzle-orm";
 
 export default task({
     name: "sendShiftReminders",
-    schedule: sendShiftRemindersSchedule,
-    async prepare() {
-        return enableShiftReminders;
-    },
+    schedule: enableShiftReminders ? sendShiftRemindersSchedule : undefined,
     async execute({ client }) {
         Logger.info("Scheduled - Sending shift reminders");
         const shiftsResponse = await api.send<PaginatedResponse<Shift>>(

@@ -37,8 +37,7 @@ export async function initWebsocket(client: Client): Promise<void> {
  * Connect to the API WebSocket and route incoming messages to handlers
  */
 export async function initAPIWebsocket(client: Client): Promise<void> {
-    const apiToken = `Bearer ${process.env.API_TOKEN}`;
-    if (!apiToken) {
+    if (!process.env.API_TOKEN) {
         Logger.error(
             "[WebSocket] API_TOKEN not found in environment variables"
         );
@@ -49,7 +48,7 @@ export async function initAPIWebsocket(client: Client): Promise<void> {
         try {
             const ws = new WebSocket(websocketURL, {
                 headers: {
-                    Authorization: apiToken,
+                    Authorization: `Bearer ${process.env.API_TOKEN}`,
                 },
             });
 
@@ -61,7 +60,9 @@ export async function initAPIWebsocket(client: Client): Promise<void> {
                 try {
                     const message = JSON.parse(data.toString());
                     const notificationType = message.notification_type;
-                    Logger.info(`Received WebSocket message: ${notificationType}`);
+                    Logger.info(
+                        `Received WebSocket message: ${notificationType}`
+                    );
                     console.log(message.data);
 
                     if (!notificationType) {

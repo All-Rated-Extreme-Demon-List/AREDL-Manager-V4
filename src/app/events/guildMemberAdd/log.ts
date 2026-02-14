@@ -1,5 +1,5 @@
-import { EventHandler } from "commandkit"
-import { guildId } from "@/../config.json"
+import { EventHandler } from "commandkit";
+import { guildId } from "@/../config.json";
 import { db } from "@/app";
 import { dailyStatsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -20,6 +20,6 @@ const handler: EventHandler<"guildMemberAdd"> = async (member) => {
         .update(dailyStatsTable)
         .set({ nbMembersJoined: stat.nbMembersJoined + 1 })
         .where(eq(dailyStatsTable.date, stat.date));
-}
+};
 
 export default handler;

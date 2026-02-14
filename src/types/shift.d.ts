@@ -18,3 +18,10 @@ export interface WebsocketShift {
     start_at: string;
     end_at: string;
 }
+
+export interface WebsocketFinishedShift extends WebsocketShift {
+    id: string;
+    completed_count: number;
+    status: ShiftStatus;
+    target_count: number;
+}

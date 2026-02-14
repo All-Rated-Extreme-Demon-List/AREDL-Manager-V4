@@ -7,7 +7,7 @@ import {
     defaultPoints,
 } from "@/../config.json";
 import { api } from "@/api";
-import { WebsocketShift } from "@/types/shift";
+import { WebsocketFinishedShift } from "@/types/shift";
 import { User } from "@/types/user";
 import { Logger } from "commandkit";
 import { Client, EmbedBuilder } from "discord.js";
@@ -16,7 +16,7 @@ import { eq } from "drizzle-orm";
 import { staffPointsTable } from "@/db/schema";
 
 interface ShiftMissedData {
-    aredl: WebsocketShift[];
+    aredl: WebsocketFinishedShift[];
 }
 
 export default {
@@ -51,15 +51,22 @@ export default {
 
             let newPoints = null;
             if (reviewer.discord_id) {
-                const points = await db
-                    .insert(staffPointsTable)
-                    .values({
-                        user: reviewer.discord_id,
-                        points: defaultPoints,
-                    })
-                    .onConflictDoNothing()
-                    .returning()
+                const pointsResult = await db
+                    .select()
+                    .from(staffPointsTable)
+                    .where(eq(staffPointsTable.user, reviewer.discord_id))
                     .get();
+                const points =
+                    pointsResult ??
+                    (await db
+                        .insert(staffPointsTable)
+                        .values({
+                            user: reviewer.discord_id,
+                            points: defaultPoints,
+                        })
+                        .onConflictDoNothing()
+                        .returning()
+                        .get());
 
                 const recordsDone = shift.completed_count / shift.target_count;
 
@@ -121,12 +128,10 @@ export default {
         }
 
         if (embeds.length > 0) {
-            for (let i = 0; i < embeds.length; i += 10) {
-                const embedBatch = embeds.slice(i, i + 10);
-                const channel =
-                    await staffGuild.channels.cache.get(missedShiftsID);
-                if (channel && channel.isSendable()) {
-                    channel.send({ embeds: embedBatch });
+            const channel = await staffGuild.channels.cache.get(missedShiftsID);
+            if (channel && channel.isSendable()) {
+                for (let i = 0; i < embeds.length; i += 10) {
+                    channel.send({ embeds: embeds.slice(i, i + 10) });
                 }
             }
         }
