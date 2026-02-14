@@ -36,7 +36,7 @@ COPY entrypoint.sh /app/entrypoint.sh
 
 RUN chmod +x /app/entrypoint.sh
 
-RUN mkdir -p /app/data \
+RUN mkdir -p /app/data ./app/logs \
     && chown -R node:node /app
 
 USER node
