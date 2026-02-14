@@ -1,0 +1,17 @@
+node_modules
+
+data
+*.sqlite
+
+build
+out
+dist
+
+.git
+.github
+.vscode
+
+.env
+.env.*
+
+**/.DS_Store

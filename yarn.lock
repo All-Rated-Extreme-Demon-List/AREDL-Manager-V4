@@ -1261,6 +1261,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kurkle/color@npm:^0.3.0":
+  version: 0.3.4
+  resolution: "@kurkle/color@npm:0.3.4"
+  checksum: 10c0/0e9fd55c614b005c5f0c4c755bca19ec0293bc7513b4ea3ec1725234f9c2fa81afbc78156baf555c8b9cb0d305619253c3f5bca016067daeebb3d00ebb4ea683
+  languageName: node
+  linkType: hard
+
 "@libsql/client@npm:^0.17.0":
   version: 0.17.0
   resolution: "@libsql/client@npm:0.17.0"
@@ -2068,6 +2075,7 @@ __metadata:
     "@types/better-sqlite3": "npm:^7.6.13"
     "@types/node": "npm:^24.0.10"
     better-sqlite3: "npm:^12.6.2"
+    chart.js: "npm:^4.5.1"
     chartjs-node-canvas: "npm:^5.0.0"
     commandkit: "npm:^1.2.0-rc.12"
     discord.js: "npm:^14.24.0"
@@ -2288,6 +2296,15 @@ __metadata:
   version: 5.6.2
   resolution: "chalk@npm:5.6.2"
   checksum: 10c0/99a4b0f0e7991796b1e7e3f52dceb9137cae2a9dfc8fc0784a550dc4c558e15ab32ed70b14b21b52beb2679b4892b41a0aa44249bcb996f01e125d58477c6976
+  languageName: node
+  linkType: hard
+
+"chart.js@npm:^4.5.1":
+  version: 4.5.1
+  resolution: "chart.js@npm:4.5.1"
+  dependencies:
+    "@kurkle/color": "npm:^0.3.0"
+  checksum: 10c0/3f2a11dcaae9079e8e6b8ad077e2ae311f04996f9da14815730891e66215ee8b5f2c0eb70b5a156e5bde0f89a41bae13506dc6153e50fd22dcb282b21eec706f
   languageName: node
   linkType: hard
 

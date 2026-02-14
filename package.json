@@ -30,6 +30,7 @@
         "@libsql/client": "^0.17.0",
         "@napi-rs/canvas": "^0.1.89",
         "better-sqlite3": "^12.6.2",
+        "chart.js": "^4.5.1",
         "chartjs-node-canvas": "^5.0.0",
         "commandkit": "^1.2.0-rc.12",
         "discord.js": "^14.24.0",
