@@ -11,6 +11,9 @@ compiled-commandkit.config.mjs
 **/*.env*
 !**/*.env.example*
 
+*config.json
+!example_config.json
+
 data
 
 logs
